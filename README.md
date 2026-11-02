@@ -7,7 +7,7 @@ Se puede publicar directamente con GitHub Pages (Settings → Pages → rama y c
 
 | Archivo | Contenido |
 |---|---|
-| `index.html` | Portada: marco conceptual, líneas, personas, publicaciones, noticias, vida del lab, contacto |
+| `index.html` | Portada: marco conceptual, líneas, personas, publicaciones, subsidios, noticias, vida del lab, contacto |
 | `ribio.html` | RIBio · Marco conceptual (se abre desde el logo de RIBio) |
 | `linea-ultrasonidos.html` | Vocalizaciones ultrasónicas y dinámica de la memoria |
 | `linea-desorientacion.html` | Desorientación espacial e integración de trayectoria |
@@ -27,5 +27,5 @@ Al editar un texto, cambiar ambas versiones.
 ## Contenido a completar
 
 Las secciones marcadas con un recuadro amarillo ("Contenido de ejemplo") tienen datos de relleno:
-personas, publicaciones, noticias, fotos de "Vida del lab" y el email de contacto.
+personas, publicaciones, subsidios, noticias, fotos de "Vida del lab" y el email de contacto.
 Las fotos van en `assets/img/`.

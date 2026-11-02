@@ -87,7 +87,7 @@ html[data-lang="en"] body [lang="es"] { display: none !important; }
 }
 .menu-btn svg { width: 26px; height: 26px; }
 
-@media (max-width: 1100px) {
+@media (max-width: 1240px) {
   .menu-btn { display: block; }
   .nav {
     position: absolute; left: 0; right: 0; top: 100%;
@@ -104,16 +104,20 @@ html[data-lang="en"] body [lang="es"] { display: none !important; }
 .hero {
   position: relative; overflow: hidden;
   background: var(--navy); color: #fff;
-  padding: 96px 0 88px;
+  padding: 120px 0 190px;
 }
 .hero::after {
   content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 4px; background: var(--grad);
 }
-.hero-wave { position: absolute; inset: 0; width: 100%; height: 100%; opacity: .5; pointer-events: none; }
+.hero-moves { position: absolute; left: 0; width: 100%; pointer-events: none; }
+.hero-moves-top { top: 0; height: 110px; }
+.hero-moves-bottom { bottom: 4px; height: 170px; }
+.hero-moves .track { fill: none; stroke-width: 1.6; stroke-linecap: round; opacity: .35; }
+.hero-moves .track.rat { stroke: #1fd6b0; stroke-dasharray: 1 6; stroke-width: 2.2; }
+.hero-moves .track.plane { stroke: #1aa7e8; stroke-dasharray: 10 8; }
+.hero-moves .track.person { stroke: #b07cff; stroke-dasharray: 3 9; stroke-width: 2.4; }
+.hero-moves .icon { opacity: .9; }
 .hero .container { position: relative; }
-.hero-kicker {
-  font-size: .8rem; letter-spacing: .18em; text-transform: uppercase; color: #9fd8ff; margin-bottom: 14px;
-}
 .hero h1 { color: #fff; font-size: clamp(2.1rem, 5vw, 3.5rem); font-weight: 600; max-width: 820px; }
 .hero .tagline {
   font-family: var(--font-head); font-size: clamp(1.15rem, 2.2vw, 1.5rem); font-weight: 300;
@@ -220,7 +224,20 @@ html[data-lang="en"] body [lang="es"] { display: none !important; }
 .contact dl { margin: 0; }
 .contact dt { font-weight: 600; color: var(--navy); margin-top: 14px; }
 .contact dd { margin: 0; color: var(--ink-soft); }
-.map { border: 0; width: 100%; height: 300px; border-radius: var(--radius); background: var(--bg-soft); }
+.map { border: 0; width: 100%; height: 300px; border-radius: var(--radius); background: #e8edf3; }
+
+/* Subsidios */
+.grant-list { list-style: none; margin: 0; padding: 0; }
+.grant-list li {
+  display: grid; grid-template-columns: 140px 1fr; gap: 20px;
+  padding: 20px 0; border-bottom: 1px solid var(--line);
+}
+.grant-list li:first-child { border-top: 1px solid var(--line); }
+.grant-period { font-family: var(--font-head); font-weight: 600; color: var(--accent); }
+.grant-funder { font-size: .8rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-soft); }
+.grant-title { font-weight: 600; color: var(--navy); margin: 2px 0; }
+.grant-pi { font-size: .93rem; color: var(--ink-soft); }
+@media (max-width: 600px) { .grant-list li { grid-template-columns: 1fr; gap: 4px; } }
 @media (max-width: 820px) { .contact { grid-template-columns: 1fr; gap: 28px; } }
 
 .placeholder-note {

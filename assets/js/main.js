@@ -54,50 +54,14 @@
       el.textContent = new Date().getFullYear();
     });
 
-    drawHeroWave();
+    setupHeroMoves();
   });
 
-  /* Onda tenue tipo vocalización ultrasónica en el encabezado de la portada */
-  function drawHeroWave() {
-    var canvas = document.querySelector(".hero-wave");
-    if (!canvas || !canvas.getContext) return;
-    var ctx = canvas.getContext("2d");
-    var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    var w, h, t = 0;
-
-    function resize() {
-      var dpr = window.devicePixelRatio || 1;
-      w = canvas.clientWidth; h = canvas.clientHeight;
-      canvas.width = w * dpr; canvas.height = h * dpr;
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    }
-
-    var waves = [
-      { color: "rgba(31, 214, 176, 0.55)", amp: 0.10, freq: 0.018, speed: 0.012, y: 0.62 },
-      { color: "rgba(26, 167, 232, 0.50)", amp: 0.07, freq: 0.031, speed: 0.018, y: 0.70 },
-      { color: "rgba(122, 53, 224, 0.45)", amp: 0.05, freq: 0.052, speed: 0.025, y: 0.78 }
-    ];
-
-    function frame() {
-      ctx.clearRect(0, 0, w, h);
-      waves.forEach(function (wv) {
-        ctx.beginPath();
-        for (var x = 0; x <= w; x += 3) {
-          // envolvente que modula la amplitud, como los "chirps" de una vocalización
-          var env = 0.5 + 0.5 * Math.sin(x * 0.004 + t * wv.speed * 0.6);
-          var y = h * wv.y + Math.sin(x * wv.freq + t * wv.speed * 6) * h * wv.amp * env;
-          if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-        }
-        ctx.strokeStyle = wv.color;
-        ctx.lineWidth = 1.4;
-        ctx.stroke();
-      });
-      t += 1;
-      if (!reduce) requestAnimationFrame(frame);
-    }
-
-    resize();
-    window.addEventListener("resize", function () { resize(); if (reduce) frame(); });
-    frame();
+  /* Trayectorias del encabezado: se detienen si el usuario prefiere menos movimiento */
+  function setupHeroMoves() {
+    if (!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches)) return;
+    document.querySelectorAll(".hero-moves").forEach(function (svg) {
+      if (svg.pauseAnimations) svg.pauseAnimations();
+    });
   }
 })();

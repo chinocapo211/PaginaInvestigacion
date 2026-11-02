@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="es" data-lang="es"
-      data-title-es="Laboratorio de Navegación & Neurocognición | ITBA"
-      data-title-en="Navigation & Neurocognition Laboratory | ITBA">
+      data-title-es="Laboratorio de Navegación & Neurocognición"
+      data-title-en="Navigation & Neurocognition Laboratory">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Laboratorio de Navegación &amp; Neurocognición | ITBA</title>
-  <meta name="description" content="Laboratorio de Navegación & Neurocognición (ITBA): vocalizaciones ultrasónicas, memoria, desorientación espacial y ecología del movimiento.">
+  <title>Laboratorio de Navegación &amp; Neurocognición</title>
+  <meta name="description" content="Laboratorio de Navegación & Neurocognición: vocalizaciones ultrasónicas, memoria, desorientación espacial y ecología del movimiento.">
   <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -22,7 +22,7 @@
       <img class="brand-mark" src="assets/img/favicon.svg" alt="">
       <span class="brand-text">
         <span lang="es">Navegación &amp; Neurocognición</span><span lang="en">Navigation &amp; Neurocognition</span>
-        <small lang="es">Laboratorio · ITBA</small><small lang="en">Laboratory · ITBA</small>
+        <small lang="es">Laboratorio</small><small lang="en">Laboratory</small>
       </span>
     </a>
     <button class="menu-btn" aria-label="Menú" aria-expanded="false">
@@ -33,6 +33,7 @@
       <a href="#lineas"><span lang="es">Investigación</span><span lang="en">Research</span></a>
       <a href="#personas"><span lang="es">Personas</span><span lang="en">People</span></a>
       <a href="#publicaciones"><span lang="es">Publicaciones</span><span lang="en">Publications</span></a>
+      <a href="#subsidios"><span lang="es">Subsidios</span><span lang="en">Funding</span></a>
       <a href="#noticias"><span lang="es">Noticias</span><span lang="en">News</span></a>
       <a href="#vida"><span lang="es">Vida del lab</span><span lang="en">Lab life</span></a>
       <a href="#contacto"><span lang="es">Contacto</span><span lang="en">Contact</span></a>
@@ -48,12 +49,51 @@
 
   <!-- ===== Portada ===== -->
   <section class="hero">
-    <canvas class="hero-wave" aria-hidden="true"></canvas>
+    <svg class="hero-moves hero-moves-top" viewBox="0 0 1200 110" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <!-- Trayectoria aérea -->
+      <path id="track-plane" class="track plane" d="M-80 80 C 160 20, 380 15, 600 55 S 980 95, 1290 30"/>
+      <!-- Avión (vista superior) -->
+      <g class="icon">
+        <path fill="#7cc8ff" d="M20 0 Q19 -2 14 -2.2 L4 -2.2 L-5 -15 L-9.5 -15 L-4.5 -2.2 L-13 -2.2 L-17 -7.5 L-20 -7.5 L-18 0 L-20 7.5 L-17 7.5 L-13 2.2 L-4.5 2.2 L-9.5 15 L-5 15 L4 2.2 L14 2.2 Q19 2 20 0 Z"/>
+        <animateMotion dur="22s" repeatCount="indefinite" rotate="auto"><mpath href="#track-plane"/></animateMotion>
+      </g>
+    </svg>
+    <svg class="hero-moves hero-moves-bottom" viewBox="0 0 1200 170" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <!-- Trayectorias terrestres: persona y roedor -->
+      <path id="track-person" class="track person" d="M-60 78 C 200 64, 420 92, 640 74 S 1020 62, 1270 82"/>
+      <path id="track-rat" class="track rat" d="M-60 140 C 60 112, 140 160, 250 134 S 400 110, 470 138 S 600 160, 690 130 S 820 110, 900 140 S 1080 158, 1270 126"/>
+      <!-- Persona caminando -->
+      <g class="icon">
+        <g fill="none" stroke="#d2b6ff" stroke-width="2.6" stroke-linecap="round">
+          <circle cx="0" cy="-31" r="4.2" fill="#d2b6ff" stroke="none"/>
+          <path d="M0 -25 L0 -12"/>
+          <path d="M0 -12 L0 0">
+            <animateTransform attributeName="transform" type="rotate" values="-24 0 -12;24 0 -12;-24 0 -12" dur="0.9s" repeatCount="indefinite"/>
+          </path>
+          <path d="M0 -12 L0 0">
+            <animateTransform attributeName="transform" type="rotate" values="24 0 -12;-24 0 -12;24 0 -12" dur="0.9s" repeatCount="indefinite"/>
+          </path>
+          <path d="M0 -22 L0 -13">
+            <animateTransform attributeName="transform" type="rotate" values="28 0 -22;-28 0 -22;28 0 -22" dur="0.9s" repeatCount="indefinite"/>
+          </path>
+        </g>
+        <animateMotion dur="40s" repeatCount="indefinite"><mpath href="#track-person"/></animateMotion>
+      </g>
+      <!-- Roedor -->
+      <g class="icon">
+        <g fill="#7ff0d6">
+          <path d="M-13 -5 Q-22 -3 -27 -9 Q-30 -12 -33 -10" fill="none" stroke="#7ff0d6" stroke-width="1.6" stroke-linecap="round"/>
+          <ellipse cx="-3" cy="-6.5" rx="11.5" ry="6.5"/>
+          <path d="M5 -10 Q14 -9 19 -4.5 Q14 -1.5 5 -2.5 Z"/>
+          <circle cx="7.5" cy="-11.5" r="3.2"/>
+          <circle cx="12" cy="-6.5" r="1" fill="#0e1a2b"/>
+          <rect x="-9" y="-1.5" width="2.4" height="3" rx="1"/>
+          <rect x="1" y="-1.5" width="2.4" height="3" rx="1"/>
+        </g>
+        <animateMotion dur="30s" repeatCount="indefinite" rotate="auto"><mpath href="#track-rat"/></animateMotion>
+      </g>
+    </svg>
     <div class="container">
-      <div class="hero-kicker">
-        <span lang="es">Departamento de Investigación y Doctorado · ITBA</span>
-        <span lang="en">Research and Doctorate Department · ITBA</span>
-      </div>
       <h1>
         <span lang="es">Laboratorio de Navegación &amp; Neurocognición</span>
         <span lang="en">Navigation &amp; Neurocognition Laboratory</span>
@@ -104,7 +144,6 @@
         <a class="line-card" href="linea-ultrasonidos.html">
           <div class="thumb"><img src="assets/img/linea-ultrasonidos.jpg" alt="Rata emitiendo vocalizaciones ultrasónicas captadas por un micrófono ultrasónico" loading="lazy"></div>
           <div class="body">
-            <span class="tag"><span lang="es">Proyecto principal</span><span lang="en">Featured project</span></span>
             <h3><span lang="es">Vocalizaciones ultrasónicas y dinámica de la memoria</span><span lang="en">Ultrasonic Vocalizations and Memory Dynamics</span></h3>
             <p>
               <span lang="es">Las ratas se comunican con sonidos por encima de lo que el oído humano puede percibir. Estudiamos qué nos dicen esas vocalizaciones sobre cómo se forman, se evocan y se transforman las memorias.</span>
@@ -220,8 +259,41 @@
     </div>
   </section>
 
+  <!-- ===== Subsidios ===== -->
+  <section class="section" id="subsidios">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow"><span lang="es">Financiamiento</span><span lang="en">Funding</span></span>
+        <h2><span lang="es">Subsidios</span><span lang="en">Funding</span></h2>
+      </div>
+      <p class="placeholder-note">
+        <span lang="es">Contenido de ejemplo: reemplazar con los subsidios del laboratorio (entidad, código, título, período y responsable).</span>
+        <span lang="en">Sample content: replace with the lab's grants (funder, code, title, period, and principal investigator).</span>
+      </p>
+      <!-- Para agregar un subsidio: copiar un bloque <li> completo -->
+      <ul class="grant-list">
+        <li>
+          <div class="grant-period">2025 – 2028</div>
+          <div>
+            <div class="grant-funder">Entidad financiadora · Código</div>
+            <div class="grant-title">Título del proyecto subsidiado</div>
+            <div class="grant-pi"><span lang="es">Responsable:</span><span lang="en">Principal investigator:</span> Nombre Apellido</div>
+          </div>
+        </li>
+        <li>
+          <div class="grant-period">2024 – 2026</div>
+          <div>
+            <div class="grant-funder">Entidad financiadora · Código</div>
+            <div class="grant-title">Título del proyecto subsidiado</div>
+            <div class="grant-pi"><span lang="es">Responsable:</span><span lang="en">Principal investigator:</span> Nombre Apellido</div>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </section>
+
   <!-- ===== Noticias ===== -->
-  <section class="section" id="noticias">
+  <section class="section alt" id="noticias">
     <div class="container">
       <div class="section-head">
         <span class="eyebrow"><span lang="es">Novedades</span><span lang="en">Updates</span></span>
@@ -246,7 +318,7 @@
   </section>
 
   <!-- ===== Vida del lab ===== -->
-  <section class="section alt" id="vida">
+  <section class="section" id="vida">
     <div class="container">
       <div class="section-head">
         <span class="eyebrow"><span lang="es">El día a día</span><span lang="en">Day to day</span></span>
@@ -262,7 +334,7 @@
   </section>
 
   <!-- ===== Contacto ===== -->
-  <section class="section" id="contacto">
+  <section class="section alt" id="contacto">
     <div class="container">
       <div class="section-head">
         <span class="eyebrow"><span lang="es">Escribinos</span><span lang="en">Get in touch</span></span>
@@ -318,7 +390,7 @@
         </ul>
       </div>
     </div>
-    <div class="footer-bottom">© <span data-year>2026</span> <span lang="es">Laboratorio de Navegación &amp; Neurocognición · ITBA</span><span lang="en">Navigation &amp; Neurocognition Laboratory · ITBA</span></div>
+    <div class="footer-bottom">© <span data-year>2026</span> <span lang="es">Laboratorio de Navegación &amp; Neurocognición</span><span lang="en">Navigation &amp; Neurocognition Laboratory</span></div>
   </div>
 </footer>
 
