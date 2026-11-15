@@ -69,6 +69,15 @@ html[data-lang="en"] body [lang="es"] { display: none !important; }
   padding: 8px 10px; border-radius: 6px;
 }
 .nav a:hover, .nav a.active { color: var(--accent); }
+@media (min-width: 1241px) {
+  .nav a { position: relative; }
+  .nav a::after {
+    content: ""; position: absolute; left: 10px; right: 10px; bottom: 2px; height: 2px;
+    background: var(--grad); border-radius: 2px;
+    transform: scaleX(0); transform-origin: left; transition: transform .25s ease;
+  }
+  .nav a:hover::after, .nav a.active::after { transform: scaleX(1); }
+}
 
 .lang-toggle {
   margin-left: 8px;
