@@ -13,6 +13,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/styles.css">
   <script src="assets/js/main.js"></script>
+  <script src="data/contenido.js"></script>
+  <script src="assets/js/contenido.js"></script>
 </head>
 <body>
 
@@ -185,12 +187,12 @@
         <span class="eyebrow"><span lang="es">Equipo</span><span lang="en">Team</span></span>
         <h2><span lang="es">Personas</span><span lang="en">People</span></h2>
       </div>
-      <p class="placeholder-note">
+      <p class="placeholder-note" data-aviso>
         <span lang="es">Contenido de ejemplo: reemplazar con foto, nombre, rol, red profesional y línea de investigación de cada integrante.</span>
         <span lang="en">Sample content: replace with each member's photo, name, role, professional profile, and research line.</span>
       </p>
       <!-- Para agregar a alguien: copiar un bloque <article class="person">, poner la foto en assets/img/personas/ y reemplazar el contenido del avatar por <img src="..." alt="..."> -->
-      <div class="people">
+      <div class="people" data-render="personas">
         <article class="person">
           <div class="avatar">NN</div>
           <h3>Nombre Apellido</h3>
@@ -238,11 +240,11 @@
         <span class="eyebrow"><span lang="es">Producción científica</span><span lang="en">Scientific output</span></span>
         <h2><span lang="es">Publicaciones</span><span lang="en">Publications</span></h2>
       </div>
-      <p class="placeholder-note">
+      <p class="placeholder-note" data-aviso>
         <span lang="es">Contenido de ejemplo: reemplazar con las publicaciones del laboratorio.</span>
         <span lang="en">Sample content: replace with the lab's publications.</span>
       </p>
-      <ul class="pub-list">
+      <ul class="pub-list" data-render="publicaciones">
         <li>
           <span class="pub-year">2026</span>
           <span class="pub-authors">Apellido A, Apellido B, Apellido C.</span>
@@ -266,12 +268,12 @@
         <span class="eyebrow"><span lang="es">Financiamiento</span><span lang="en">Funding</span></span>
         <h2><span lang="es">Subsidios</span><span lang="en">Funding</span></h2>
       </div>
-      <p class="placeholder-note">
+      <p class="placeholder-note" data-aviso>
         <span lang="es">Contenido de ejemplo: reemplazar con los subsidios del laboratorio (entidad, código, título, período y responsable).</span>
         <span lang="en">Sample content: replace with the lab's grants (funder, code, title, period, and principal investigator).</span>
       </p>
       <!-- Para agregar un subsidio: copiar un bloque <li> completo -->
-      <ul class="grant-list">
+      <ul class="grant-list" data-render="subsidios">
         <li>
           <div class="grant-period">2025 – 2028</div>
           <div>
@@ -299,7 +301,7 @@
         <span class="eyebrow"><span lang="es">Novedades</span><span lang="en">Updates</span></span>
         <h2><span lang="es">Noticias</span><span lang="en">News</span></h2>
       </div>
-      <div class="news">
+      <div class="news" data-render="noticias">
         <article class="news-item">
           <time datetime="2026">2026</time>
           <h3><span lang="es">Abre la inscripción a RIBio</span><span lang="en">RIBio enrollment is open</span></h3>
@@ -324,7 +326,7 @@
         <span class="eyebrow"><span lang="es">El día a día</span><span lang="en">Day to day</span></span>
         <h2><span lang="es">Vida del lab</span><span lang="en">Lab life</span></h2>
       </div>
-      <div class="gallery">
+      <div class="gallery" data-render="galeria">
         <div class="ph"><span lang="es">Foto del laboratorio</span><span lang="en">Lab photo</span></div>
         <div class="ph"><span lang="es">Foto del equipo</span><span lang="en">Team photo</span></div>
         <div class="ph"><span lang="es">Congresos y charlas</span><span lang="en">Conferences and talks</span></div>
@@ -349,7 +351,7 @@
             Iguazú 341, (1437) <span lang="es">Ciudad de Buenos Aires, Argentina</span><span lang="en">Buenos Aires, Argentina</span>
           </dd>
           <dt>Email</dt>
-          <dd><a href="mailto:contacto@ejemplo.com">contacto@ejemplo.com</a> <span lang="es">(a completar)</span><span lang="en">(to be completed)</span></dd>
+          <dd><span data-render="email"><a href="mailto:contacto@ejemplo.com">contacto@ejemplo.com</a></span> <span data-aviso><span lang="es">(a completar)</span><span lang="en">(to be completed)</span></span></dd>
           <dt><span lang="es">Cursos de doctorado</span><span lang="en">Doctoral courses</span></dt>
           <dd><a href="https://investigacion.itba.edu.ar/cursos-de-doctorado/" target="_blank" rel="noopener">investigacion.itba.edu.ar</a></dd>
         </dl>
@@ -390,7 +392,7 @@
         </ul>
       </div>
     </div>
-    <div class="footer-bottom">© <span data-year>2026</span> <span lang="es">Laboratorio de Navegación &amp; Neurocognición</span><span lang="en">Navigation &amp; Neurocognition Laboratory</span></div>
+    <div class="footer-bottom">© <span data-year>2026</span> <span lang="es">Laboratorio de Navegación &amp; Neurocognición</span><span lang="en">Navigation &amp; Neurocognition Laboratory</span> · <a class="admin-link" href="admin.html">Admin</a></div>
   </div>
 </footer>
 

@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="es" data-lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Panel de administración | Laboratorio de Navegación &amp; Neurocognición</title>
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/styles.css">
+  <link rel="stylesheet" href="assets/css/admin.css">
+  <script src="data/contenido.js"></script>
+  <script src="assets/js/contenido.js"></script>
+  <script src="assets/js/admin.js" defer></script>
+</head>
+<body class="adm">
+
+<header class="adm-header">
+  <div class="container">
+    <a class="brand" href="index.html">
+      <img class="brand-mark" src="assets/img/favicon.svg" alt="">
+      <span class="brand-text">Panel de administración<small>Navegación &amp; Neurocognición</small></span>
+    </a>
+    <div class="adm-status">
+      <span id="estado" class="adm-pill">Cargando…</span>
+      <button type="button" class="adm-btn ghost" id="btn-descartar" hidden>Descartar cambios</button>
+      <button type="button" class="adm-btn ghost" id="btn-preview">Vista previa</button>
+      <button type="button" class="adm-btn primary" id="btn-publicar">Publicar</button>
+    </div>
+  </div>
+</header>
+
+<div class="container adm-layout">
+  <nav class="adm-tabs" id="tabs" aria-label="Secciones">
+    <button type="button" data-tab="personas">Personas</button>
+    <button type="button" data-tab="noticias">Noticias</button>
+    <button type="button" data-tab="publicaciones">Publicaciones</button>
+    <button type="button" data-tab="subsidios">Subsidios</button>
+    <button type="button" data-tab="galeria">Vida del lab</button>
+    <button type="button" data-tab="ajustes">Ajustes</button>
+    <button type="button" data-tab="publicacion">Conexión con GitHub</button>
+  </nav>
+
+  <main class="adm-main">
+    <div id="aviso" class="adm-alert" hidden></div>
+    <div id="panel"></div>
+  </main>
+</div>
+
+<dialog id="editor" class="adm-dialog">
+  <form id="editor-form" method="dialog" novalidate>
+    <h2 id="editor-titulo">Editar</h2>
+    <div id="editor-campos"></div>
+    <p class="adm-error" id="editor-error" hidden></p>
+    <div class="adm-dialog-actions">
+      <button type="button" class="adm-btn ghost" id="editor-cancelar">Cancelar</button>
+      <button type="submit" class="adm-btn primary">Guardar</button>
+    </div>
+  </form>
+</dialog>
+
+<noscript><p class="container">El panel necesita JavaScript.</p></noscript>
+</body>
+</html>
