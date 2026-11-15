@@ -1,5 +1,5 @@
 /* Laboratorio de Navegación & Neurocognición — contenido editable
-   Dibuja líneas, personas, publicaciones, subsidios, noticias, galería y contacto
+   Dibuja líneas, noticias, personas, publicaciones, subsidios, galería y contacto
    a partir de data/contenido.js (que se edita desde admin.html).
 
    En el HTML, cada bloque se marca con data-render="<bloque>".
@@ -11,24 +11,21 @@
 
   /* ---------- Valores por defecto (si data/contenido.js no los trae) ---------- */
   var DEFAULT_LINEAS = [
-    { id: "ultrasonidos", pagina: "linea-ultrasonidos.html", destacada: true,
+    { id: "ultrasonidos", destacada: true, imagen: "assets/img/linea-ultrasonidos.jpg",
       titulo_es: "Vocalizaciones ultrasónicas y dinámica de la memoria", titulo_en: "Ultrasonic Vocalizations and Memory Dynamics",
       corto_es: "Ultrasonidos", corto_en: "Ultrasonics",
       resumen_es: "Las ratas se comunican con sonidos por encima de lo que el oído humano puede percibir. Estudiamos qué nos dicen esas vocalizaciones sobre cómo se forman, se evocan y se transforman las memorias.",
-      resumen_en: "Rats communicate with sounds above the range of human hearing. We study what these vocalizations reveal about how memories are formed, retrieved, and transformed.",
-      imagen: "assets/img/linea-ultrasonidos.jpg", descripcion_es: "", descripcion_en: "" },
-    { id: "desorientacion", pagina: "linea-desorientacion.html", destacada: true,
+      resumen_en: "Rats communicate with sounds above the range of human hearing. We study what these vocalizations reveal about how memories are formed, retrieved, and transformed." },
+    { id: "desorientacion", destacada: true, imagen: "assets/img/linea-desorientacion.jpg",
       titulo_es: "Desorientación espacial e integración de trayectoria", titulo_en: "Spatial Disorientation and Path Integration",
       corto_es: "Desorientación", corto_en: "Disorientation",
       resumen_es: "Cómo el cerebro estima la propia posición a partir del movimiento y qué ocurre cuando esas señales internas entran en conflicto, como en el vuelo.",
-      resumen_en: "How the brain estimates its own position from self-motion, and what happens when those internal signals conflict, as in flight.",
-      imagen: "assets/img/linea-desorientacion.jpg", descripcion_es: "", descripcion_en: "" },
-    { id: "navegacion", pagina: "linea-navegacion.html", destacada: true,
+      resumen_en: "How the brain estimates its own position from self-motion, and what happens when those internal signals conflict, as in flight." },
+    { id: "navegacion", destacada: true, imagen: "assets/img/linea-navegacion.jpg",
       titulo_es: "Ecología del movimiento y eficiencia de navegación", titulo_en: "Movement Ecology and Navigation Efficiency",
       corto_es: "Navegación", corto_en: "Navigation",
       resumen_es: "Trayectorias, decisiones y estrategias: cómo los animales exploran y aprenden a moverse de forma eficiente en entornos complejos.",
-      resumen_en: "Trajectories, decisions, and strategies: how animals explore and learn to move efficiently through complex environments.",
-      imagen: "assets/img/linea-navegacion.jpg", descripcion_es: "", descripcion_en: "" }
+      resumen_en: "Trajectories, decisions, and strategies: how animals explore and learn to move efficiently through complex environments." }
   ];
 
   var DEFAULT_CONTACTO = {
@@ -47,21 +44,40 @@
 
   var LISTAS = ["lineas", "personas", "publicaciones", "subsidios", "noticias", "galeria"];
 
+  function copia(o) { return JSON.parse(JSON.stringify(o)); }
+
   // Completa lo que falte y adapta datos guardados con versiones anteriores del panel
   function normalizar(d) {
-    d = d ? JSON.parse(JSON.stringify(d)) : {};
+    d = d ? copia(d) : {};
     d.ajustes = d.ajustes || {};
     if (d.ajustes.mostrarAvisosEjemplo === undefined) d.ajustes.mostrarAvisosEjemplo = true;
     if (!d.contacto) {
-      d.contacto = JSON.parse(JSON.stringify(DEFAULT_CONTACTO));
+      d.contacto = copia(DEFAULT_CONTACTO);
       d.contacto.email = d.ajustes.email || "";
     }
     delete d.ajustes.email;
     Object.keys(DEFAULT_CONTACTO).forEach(function (k) {
       if (d.contacto[k] === undefined) d.contacto[k] = DEFAULT_CONTACTO[k];
     });
-    if (!Array.isArray(d.lineas)) d.lineas = JSON.parse(JSON.stringify(DEFAULT_LINEAS));
+    if (!Array.isArray(d.lineas)) d.lineas = copia(DEFAULT_LINEAS);
     LISTAS.forEach(function (k) { if (!Array.isArray(d[k])) d[k] = []; });
+
+    d.lineas.forEach(function (l) {
+      if (!Array.isArray(l.contenido)) {
+        l.contenido = l.descripcion_es ? [{ tipo: "parrafo", texto_es: l.descripcion_es, texto_en: l.descripcion_en || "" }] : [];
+      }
+      delete l.pagina; delete l.descripcion_es; delete l.descripcion_en;
+      if (l.destacada === undefined) l.destacada = true;
+    });
+    d.noticias.forEach(function (n, i) {
+      if (n.destacada === undefined) n.destacada = i === 0;
+      if (n.imagen === undefined) n.imagen = "";
+      if (!Array.isArray(n.contenido)) {
+        n.contenido = [];
+        if (n.enlace) n.contenido.push({ tipo: "boton", texto_es: "Más información", texto_en: "Learn more", url: n.enlace });
+      }
+      delete n.enlace;
+    });
     return d;
   }
 
@@ -89,11 +105,16 @@
     return '<span lang="es">' + esc(es) + '</span><span lang="en">' + esc(en) + "</span>";
   }
 
-  // Párrafos separados por una línea en blanco
+  // Párrafos separados por una línea en blanco; un salto simple queda como salto de línea
   function parrafos(es, en) {
     var a = String(es || "").split(/\n\s*\n/), b = String(en || es || "").split(/\n\s*\n/);
-    return a.map(function (p, i) { return "<p>" + bi(p.trim(), (b[i] || p).trim()) + "</p>"; }).join("");
+    return a.filter(function (p) { return p.trim(); }).map(function (p, i) {
+      var e = (b[i] || p).trim();
+      return '<p><span lang="es">' + esc(p.trim()).replace(/\n/g, "<br>") + '</span><span lang="en">' + esc(e).replace(/\n/g, "<br>") + "</span></p>";
+    }).join("");
   }
+
+  function renglones(t) { return String(t || "").split(/\n/).map(function (x) { return x.trim(); }).filter(Boolean); }
 
   function initials(nombre) {
     var parts = String(nombre || "").trim().split(/\s+/).filter(Boolean);
@@ -101,12 +122,14 @@
     return (parts[0][0] + (parts.length > 1 ? parts[parts.length - 1][0] : "")).toUpperCase();
   }
 
-  function lineaUrl(l) { return l.pagina || "linea.html?id=" + encodeURIComponent(l.id); }
+  function lineaUrl(l) { return "linea.html?id=" + encodeURIComponent(l.id); }
+  function noticiaUrl(n) { return "noticia.html?id=" + encodeURIComponent(n.id); }
 
   function vacio(es, en) { return '<p class="empty-note">' + bi(es, en) + "</p>"; }
 
   function boton(href, es, en) {
-    return '<a class="btn" href="' + esc(href) + '">' + bi(es, en) + "</a>";
+    var ext = isExternal(href);
+    return '<a class="btn" href="' + esc(href) + '"' + (ext ? ' target="_blank" rel="noopener"' : "") + ">" + bi(es, en) + (ext ? " ↗" : "") + "</a>";
   }
 
   /* ---------- Datos (o borrador, en vista previa) ---------- */
@@ -131,24 +154,77 @@
     return safeUrl(path);
   }
 
-  function lineaById(d, id) {
-    for (var i = 0; i < d.lineas.length; i++) if (d.lineas[i].id === id) return d.lineas[i];
+  function porId(lista, id) {
+    for (var i = 0; i < lista.length; i++) if (lista[i].id === id) return lista[i];
     return null;
   }
 
   function enLinea(item, linea) { return !linea || (item.lineas || []).indexOf(linea) !== -1; }
 
-  function idLineaUrl() {
+  function idUrl() {
     var m = location.search.match(/[?&]id=([^&#]+)/);
     return m ? decodeURIComponent(m[1]) : "";
   }
 
-  function limite(el) {
-    var n = parseInt(el.getAttribute("data-limite"), 10);
-    return n > 0 ? n : Infinity;
+  function ponerTitulo(es, en) {
+    var root = document.documentElement;
+    root.setAttribute("data-title-es", es + " | Laboratorio de Navegación & Neurocognición");
+    root.setAttribute("data-title-en", (en || es) + " | Navigation & Neurocognition Laboratory");
+    document.title = root.getAttribute("data-title-" + (root.getAttribute("data-lang") === "en" ? "en" : "es"));
   }
 
-  /* ---------- Piezas ---------- */
+  /* ---------- Bloques de contenido de una página (títulos, textos, imágenes…) ---------- */
+  var BLOQUES = {
+    titulo: function (b) { return "<h2>" + bi(b.texto_es, b.texto_en) + "</h2>"; },
+    subtitulo: function (b) { return "<h3>" + bi(b.texto_es, b.texto_en) + "</h3>"; },
+    parrafo: function (b) { return parrafos(b.texto_es, b.texto_en); },
+    imagen: function (b) {
+      var src = img(b.src);
+      if (!src) return "";
+      var en = b.src_en ? img(b.src_en) : "";
+      var alt = esc(b.pie_es || "");
+      var im = en
+        ? '<img lang="es" src="' + esc(src) + '" alt="' + alt + '" loading="lazy"><img lang="en" src="' + esc(en) + '" alt="' + esc(b.pie_en || b.pie_es || "") + '" loading="lazy">'
+        : '<img src="' + esc(src) + '" alt="' + alt + '" loading="lazy">';
+      return '<figure class="art-fig">' + im + (b.pie_es ? "<figcaption>" + bi(b.pie_es, b.pie_en) + "</figcaption>" : "") + "</figure>";
+    },
+    lista: function (b) {
+      var es = renglones(b.items_es), en = renglones(b.items_en);
+      if (!es.length) return "";
+      return "<ul>" + es.map(function (x, i) { return "<li>" + bi(x, en[i]) + "</li>"; }).join("") + "</ul>";
+    },
+    datos: function (b) {
+      var es = renglones(b.items_es), en = renglones(b.items_en);
+      if (!es.length) return "";
+      return '<div class="facts">' + es.map(function (x, i) {
+        var p = x.split("|"), q = String(en[i] || x).split("|");
+        var valor = p.length > 1 ? p[0].trim() : "";
+        var tes = (p.length > 1 ? p.slice(1).join("|") : p[0]).trim();
+        var ten = (q.length > 1 ? q.slice(1).join("|") : q[0]).trim();
+        return '<div class="fact">' + (valor ? "<strong>" + esc(valor) + "</strong>" : "") + bi(tes, ten) + "</div>";
+      }).join("") + "</div>";
+    },
+    boton: function (b) {
+      var u = safeUrl(b.url);
+      if (!u || !b.texto_es) return "";
+      return '<p class="art-btn">' + boton(u, b.texto_es, b.texto_en) + "</p>";
+    }
+  };
+
+  function bloquesHtml(lista) {
+    return (lista || []).map(function (b) { return BLOQUES[b.tipo] ? BLOQUES[b.tipo](b) : ""; }).join("");
+  }
+
+  function articulo(item) {
+    var portada = img(item.imagen);
+    var cuerpo = bloquesHtml(item.contenido);
+    if (!cuerpo && !portada) cuerpo = "<p>" + bi(item.resumen_es || item.texto_es, item.resumen_en || item.texto_en) + "</p>";
+    return '<article class="article">' +
+      (portada ? '<img class="art-cover" src="' + esc(portada) + '" alt="">' : "") +
+      cuerpo + "</article>";
+  }
+
+  /* ---------- Tarjetas ---------- */
   function tarjetaLinea(l) {
     var foto = img(l.imagen);
     return '<a class="line-card" id="linea-' + esc(l.id) + '" href="' + esc(lineaUrl(l)) + '">' +
@@ -158,25 +234,17 @@
       '<span class="more">' + bi("Ver proyecto →", "View project →") + "</span></div></a>";
   }
 
-  function noticia(n) {
-    var url = safeUrl(n.enlace);
-    var mas = url
-      ? ' <a href="' + esc(url) + '"' + (isExternal(url) ? ' target="_blank" rel="noopener"' : "") + ">" +
-        bi("Más información", "Learn more") + "</a>"
-      : "";
-    return '<article class="news-item" id="noticia-' + esc(n.id) + '">' +
-      '<time datetime="' + esc(n.fecha) + '">' + esc(n.fecha) + "</time>" +
+  function tarjetaNoticia(n) {
+    var foto = img(n.imagen);
+    return '<a class="news-card" id="noticia-' + esc(n.id) + '" href="' + esc(noticiaUrl(n)) + '">' +
+      (foto ? '<div class="thumb"><img src="' + esc(foto) + '" alt="" loading="lazy"></div>' : "") +
+      '<div class="body"><time datetime="' + esc(n.fecha) + '">' + esc(n.fecha) + "</time>" +
       "<h3>" + bi(n.titulo_es, n.titulo_en) + "</h3>" +
-      "<p>" + bi(n.texto_es, n.texto_en) + mas + "</p>" +
-      "</article>";
+      (n.texto_es ? "<p>" + bi(n.texto_es, n.texto_en) + "</p>" : "") +
+      '<span class="more">' + bi("Leer más →", "Read more →") + "</span></div></a>";
   }
 
-  function lineaActual(d, el) {
-    var id = el.getAttribute("data-linea");
-    return id ? lineaById(d, id) : null;
-  }
-
-  /* ---------- Bloques ---------- */
+  /* ---------- Bloques del HTML ---------- */
   var render = {
     /* Líneas de investigación */
     "lineas-destacadas": function (d) {
@@ -201,23 +269,44 @@
       return html;
     },
 
-    /* Página genérica de una línea (linea.html?id=...) */
-    "linea-hero": function (d, el) {
-      var l = lineaActual(d, el);
+    /* Página de una línea (linea.html?id=...) */
+    "linea-hero": function (d) {
+      var l = porId(d.lineas, idUrl());
       if (!l) return "<h1>" + bi("Línea no encontrada", "Research line not found") + "</h1>";
-      var root = document.documentElement;
-      root.setAttribute("data-title-es", l.titulo_es + " | Laboratorio de Navegación & Neurocognición");
-      root.setAttribute("data-title-en", (l.titulo_en || l.titulo_es) + " | Navigation & Neurocognition Laboratory");
-      document.title = root.getAttribute("data-title-" + (root.getAttribute("data-lang") === "en" ? "en" : "es"));
+      ponerTitulo(l.titulo_es, l.titulo_en);
       return "<h1>" + bi(l.titulo_es, l.titulo_en) + "</h1><p>" + bi(l.resumen_es, l.resumen_en) + "</p>";
     },
-    "linea-cuerpo": function (d, el) {
-      var l = lineaActual(d, el);
+    "linea-cuerpo": function (d) {
+      var l = porId(d.lineas, idUrl());
       if (!l) return '<p><a href="lineas.html">' + bi("Ver todas las líneas", "See all research lines") + "</a></p>";
-      var foto = img(l.imagen);
-      var texto = l.descripcion_es ? parrafos(l.descripcion_es, l.descripcion_en) : "<p>" + bi(l.resumen_es, l.resumen_en) + "</p>";
-      return '<div class="split"><div class="prose"><h2>' + bi("Sobre el proyecto", "About the project") + "</h2>" + texto + "</div>" +
-        (foto ? '<img src="' + esc(foto) + '" alt="">' : "") + "</div>";
+      return articulo(l);
+    },
+
+    /* Noticias */
+    "noticias-destacadas": function (d) {
+      var lista = d.noticias.filter(function (n) { return n.destacada; });
+      if (!lista.length) return d.noticias.length ? "" : vacio("No hay noticias por ahora.", "No news yet.");
+      return lista.map(tarjetaNoticia).join("");
+    },
+    noticias: function (d) {
+      if (!d.noticias.length) return vacio("No hay noticias por ahora.", "No news yet.");
+      return d.noticias.map(tarjetaNoticia).join("");
+    },
+    "noticias-mas": function (d) {
+      var dest = d.noticias.filter(function (n) { return n.destacada; }).length;
+      return d.noticias.length > dest ? boton("noticias.html", "Ver todas las noticias", "See all news") : "";
+    },
+    "noticia-hero": function (d) {
+      var n = porId(d.noticias, idUrl());
+      if (!n) return "<h1>" + bi("Noticia no encontrada", "News item not found") + "</h1>";
+      ponerTitulo(n.titulo_es, n.titulo_en);
+      return '<time class="hero-date" datetime="' + esc(n.fecha) + '">' + esc(n.fecha) + "</time>" +
+        "<h1>" + bi(n.titulo_es, n.titulo_en) + "</h1>" + (n.texto_es ? "<p>" + bi(n.texto_es, n.texto_en) + "</p>" : "");
+    },
+    "noticia-cuerpo": function (d) {
+      var n = porId(d.noticias, idUrl());
+      if (!n) return '<p><a href="noticias.html">' + bi("Ver todas las noticias", "See all news") + "</a></p>";
+      return articulo(n) + '<p class="art-back"><a href="noticias.html">' + bi("← Todas las noticias", "← All news") + "</a></p>";
     },
 
     /* Personas */
@@ -235,7 +324,7 @@
         if (li) links.push('<a href="' + esc(li) + '" target="_blank" rel="noopener">LinkedIn</a>');
         if (!linea) {
           (p.lineas || []).forEach(function (id) {
-            var l = lineaById(d, id);
+            var l = porId(d.lineas, id);
             if (l) links.push('<a href="' + esc(lineaUrl(l)) + '">' + bi(l.corto_es || l.titulo_es, l.corto_en || l.titulo_en) + "</a>");
           });
         }
@@ -281,16 +370,6 @@
       }).join("");
     },
 
-    /* Noticias (data-limite="1" en la portada) */
-    noticias: function (d, el) {
-      var lista = d.noticias.slice(0, limite(el));
-      if (!lista.length) return vacio("No hay noticias por ahora.", "No news yet.");
-      return lista.map(noticia).join("");
-    },
-    "noticias-mas": function (d) {
-      return d.noticias.length > 1 ? boton("noticias.html", "Ver todas las noticias", "See all news") : "";
-    },
-
     /* Vida del lab */
     galeria: function (d) {
       if (!d.galeria.length) return vacio("Próximamente.", "Coming soon.");
@@ -331,7 +410,7 @@
     },
     "cursos-link": function (d, el) {
       var u = safeUrl(d.contacto.cursosUrl);
-      el.closest("li") ? (el.closest("li").hidden = !u) : (el.hidden = !u);
+      (el.closest("li") || el).hidden = !u;
       if (u) el.setAttribute("href", u);
       return null;
     }
@@ -367,8 +446,8 @@
     var d = ctx.data;
     if (!d) return; // sin datos: queda el contenido escrito en el HTML
 
-    var idUrl = idLineaUrl();
-    document.querySelectorAll('[data-linea="@url"]').forEach(function (el) { el.setAttribute("data-linea", idUrl); });
+    var id = idUrl();
+    document.querySelectorAll('[data-linea="@url"]').forEach(function (el) { el.setAttribute("data-linea", id); });
 
     document.querySelectorAll("[data-render]").forEach(function (el) {
       var fn = render[el.getAttribute("data-render")];
@@ -395,7 +474,7 @@
     // Si se llegó con #algo (por ejemplo desde el panel), ir hasta ese elemento y resaltarlo
     if (location.hash.length > 1) {
       var target = document.getElementById(decodeURIComponent(location.hash.slice(1)));
-      if (target) {
+      if (target && target.tagName !== "SECTION") {
         target.classList.add("is-target");
         setTimeout(function () { target.scrollIntoView({ block: "center" }); }, 60);
       }
@@ -404,6 +483,7 @@
 
   window.SITE_NORMALIZAR = normalizar;
   window.SITE_LINEA_URL = lineaUrl;
+  window.SITE_NOTICIA_URL = noticiaUrl;
   window.SITE_DRAFT_KEY = DRAFT_KEY;
 
   document.addEventListener("DOMContentLoaded", aplicar);

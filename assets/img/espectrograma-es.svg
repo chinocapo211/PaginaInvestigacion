@@ -1,0 +1,26 @@
+<svg viewBox="0 0 760 330" xmlns="http://www.w3.org/2000/svg" width="760" height="330">
+          <rect width="760" height="330" rx="10" fill="#0e1a2b"/>
+          <rect x="70" y="250" width="660" height="50" fill="#ffffff" opacity=".07"/>
+          <line x1="70" y1="250" x2="730" y2="250" stroke="#ffffff" stroke-opacity=".45" stroke-dasharray="5 5"/>
+          <text x="724" y="244" fill="#cfe0f0" font-size="12" text-anchor="end" font-family="Inter, sans-serif">Límite de la audición humana (~20 kHz)</text>
+          <line x1="70" y1="300" x2="730" y2="300" stroke="#8193a7"/>
+          <line x1="70" y1="20" x2="70" y2="300" stroke="#8193a7"/>
+          <g fill="#8193a7" font-size="11" font-family="Inter, sans-serif" text-anchor="end">
+            <text x="62" y="304">0</text><text x="62" y="179">50</text><text x="62" y="54">100</text>
+          </g>
+          <text x="22" y="160" fill="#b8c6d6" font-size="12" font-family="Inter, sans-serif" transform="rotate(-90 22 160)" text-anchor="middle">kHz</text>
+          <text x="400" y="322" fill="#b8c6d6" font-size="12" font-family="Inter, sans-serif" text-anchor="middle">Tiempo →</text>
+          <g stroke="#1fd6b0" stroke-width="5" stroke-linecap="round">
+            <line x1="100" y1="245" x2="250" y2="246"/>
+            <line x1="275" y1="246" x2="395" y2="247"/>
+          </g>
+          <text x="100" y="226" fill="#1fd6b0" font-size="13" font-weight="600" font-family="Inter, sans-serif">~22 kHz · llamadas largas y planas</text>
+          <g fill="none" stroke="#b07cff" stroke-width="3" stroke-linecap="round">
+            <path d="M440 190 q8 -30 16 -10"/>
+            <path d="M480 175 q5 -18 10 0 q5 18 10 0 q5 -18 10 0 q5 18 10 0"/>
+            <path d="M550 160 l18 30"/>
+            <path d="M590 185 q10 -40 20 -20 q6 12 12 -6"/>
+            <path d="M645 170 q5 -14 10 0 q5 14 10 0 q5 -14 10 0"/>
+          </g>
+          <text x="440" y="120" fill="#b07cff" font-size="13" font-weight="600" font-family="Inter, sans-serif">~50 kHz · llamadas cortas y moduladas</text>
+        </svg>

@@ -48,18 +48,18 @@
 </header>
 
 <main>
-  <!-- Página para las líneas creadas desde el panel: se abre como linea.html?id=<id de la línea> -->
+  <!-- Página de cada línea de investigación: linea.html?id=<id>. El contenido se edita desde admin.html -->
   <section class="page-hero">
     <div class="container">
       <div class="breadcrumb">
         <a href="lineas.html"><span lang="es">← Líneas de investigación</span><span lang="en">← Research lines</span></a>
       </div>
-      <div data-render="linea-hero" data-linea="@url"></div>
+      <div data-render="linea-hero"></div>
     </div>
   </section>
 
   <section class="section">
-    <div class="container" data-render="linea-cuerpo" data-linea="@url"></div>
+    <div class="container" data-render="linea-cuerpo"></div>
   </section>
 
   <section class="section alt">
@@ -67,6 +67,10 @@
       <div class="section-head">
         <h2><span lang="es">Personas en este proyecto</span><span lang="en">People in this project</span></h2>
       </div>
+      <p class="placeholder-note" data-aviso>
+        <span lang="es">Contenido de ejemplo: completar con las personas que participan en esta línea.</span>
+        <span lang="en">Sample content: fill in with the people working on this line.</span>
+      </p>
       <div class="people" data-render="personas" data-linea="@url"></div>
     </div>
   </section>
@@ -97,9 +101,9 @@
       <div>
         <h4><span lang="es">Investigación</span><span lang="en">Research</span></h4>
         <ul data-render="lineas-footer">
-          <li><a href="linea-ultrasonidos.html"><span lang="es">Vocalizaciones ultrasónicas</span><span lang="en">Ultrasonic vocalizations</span></a></li>
-          <li><a href="linea-desorientacion.html"><span lang="es">Desorientación espacial</span><span lang="en">Spatial disorientation</span></a></li>
-          <li><a href="linea-navegacion.html"><span lang="es">Ecología del movimiento</span><span lang="en">Movement ecology</span></a></li>
+          <li><a href="linea.html?id=ultrasonidos"><span lang="es">Vocalizaciones ultrasónicas</span><span lang="en">Ultrasonic vocalizations</span></a></li>
+          <li><a href="linea.html?id=desorientacion"><span lang="es">Desorientación espacial</span><span lang="en">Spatial disorientation</span></a></li>
+          <li><a href="linea.html?id=navegacion"><span lang="es">Ecología del movimiento</span><span lang="en">Movement ecology</span></a></li>
         </ul>
       </div>
       <div>

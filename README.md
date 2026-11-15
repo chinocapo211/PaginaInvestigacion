@@ -7,15 +7,14 @@ Se puede publicar directamente con GitHub Pages (Settings → Pages → rama y c
 
 | Archivo | Contenido |
 |---|---|
-| `index.html` | Portada: marco conceptual, líneas, personas, publicaciones, subsidios, noticias, vida del lab, contacto |
+| `index.html` | Portada: marco conceptual, líneas destacadas, personas, publicaciones, subsidios, noticias destacadas, vida del lab, contacto |
 | `ribio.html` | RIBio · Marco conceptual (se abre desde el logo de RIBio) |
-| `linea-ultrasonidos.html` | Vocalizaciones ultrasónicas y dinámica de la memoria |
-| `linea-desorientacion.html` | Desorientación espacial e integración de trayectoria |
-| `linea-navegacion.html` | Ecología del movimiento y eficiencia de navegación |
-| `lineas.html` | Todas las líneas de investigación (botón "Ver todas las líneas" de la portada) |
-| `linea.html?id=...` | Página de las líneas creadas desde el panel |
-| `noticias.html` | Todas las noticias (botón "Ver todas las noticias" de la portada) |
+| `lineas.html` | Todas las líneas de investigación (botón "Ver todas las líneas") |
+| `linea.html?id=...` | Página de cada línea de investigación |
+| `noticias.html` | Todas las noticias (botón "Ver todas las noticias") |
+| `noticia.html?id=...` | Página de cada noticia |
 | `admin.html` | Panel de administración (link "Admin" en el pie de página) |
+| `linea-ultrasonidos.html`, `linea-desorientacion.html`, `linea-navegacion.html` | Solo redirigen a `linea.html?id=...` (para no romper links viejos) |
 
 ## Idiomas (español / inglés)
 
@@ -33,9 +32,10 @@ Al editar un texto, cambiar ambas versiones.
 Líneas de investigación, personas, noticias, publicaciones, subsidios, fotos de "Vida del lab", datos de contacto
 y los recuadros amarillos de "Contenido de ejemplo" se editan desde el panel, sin tocar código.
 
-- **Líneas destacadas:** las marcadas con ★ salen en la portada (se recomiendan 3). Si hay más líneas que destacadas,
-  aparece el botón "Ver todas las líneas". Las 3 líneas originales tienen página propia escrita a mano; las nuevas usan `linea.html`.
-- **Noticias:** la portada muestra solo la primera de la lista; el resto está en `noticias.html`.
+- **Páginas de noticias y líneas:** cada noticia y cada línea tiene su propia página, que se arma desde el panel
+  con bloques: títulos, subtítulos, textos, imágenes con epígrafe, listas, datos destacados y botones.
+- **Destacadas:** las noticias y líneas marcadas con ★ salen en la portada. Si hay más que las destacadas,
+  aparece el botón "Ver todas las noticias" / "Ver todas las líneas".
 - Cada elemento del panel muestra dónde aparece en el sitio, con un link que lleva directo a él.
 
 - Los datos viven en `data/contenido.js`. Las páginas los dibujan con `assets/js/contenido.js` en los

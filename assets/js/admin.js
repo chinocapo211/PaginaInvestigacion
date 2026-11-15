@@ -5,6 +5,30 @@
   var DRAFT_KEY = window.SITE_DRAFT_KEY || "nn-admin-borrador";
   var normalizar = window.SITE_NORMALIZAR;
   var lineaUrl = window.SITE_LINEA_URL;
+  var noticiaUrl = window.SITE_NOTICIA_URL;
+
+  /* ---------- Bloques para armar las páginas de noticias y líneas ---------- */
+  var TIPOS_BLOQUE = {
+    titulo: { nombre: "Título", campos: [
+      { fila: [{ k: "texto_es", label: "Título (español)" }, { k: "texto_en", label: "Título (inglés)" }] }] },
+    subtitulo: { nombre: "Subtítulo", campos: [
+      { fila: [{ k: "texto_es", label: "Subtítulo (español)" }, { k: "texto_en", label: "Subtítulo (inglés)" }] }] },
+    parrafo: { nombre: "Texto", campos: [
+      { fila: [{ k: "texto_es", label: "Texto (español)", tipo: "textarea" }, { k: "texto_en", label: "Texto (inglés)", tipo: "textarea" }] }],
+      ayuda: "Para separar párrafos, dejá una línea en blanco." },
+    imagen: { nombre: "Imagen", campos: [
+      { k: "src", label: "Imagen", tipo: "imagen" },
+      { fila: [{ k: "pie_es", label: "Epígrafe (español, opcional)" }, { k: "pie_en", label: "Epígrafe (inglés)" }] }] },
+    lista: { nombre: "Lista", campos: [
+      { fila: [{ k: "items_es", label: "Puntos (español)", tipo: "textarea" }, { k: "items_en", label: "Puntos (inglés)", tipo: "textarea" }] }],
+      ayuda: "Un punto por renglón." },
+    datos: { nombre: "Datos destacados", campos: [
+      { fila: [{ k: "items_es", label: "Datos (español)", tipo: "textarea", ph: "~22 kHz | Llamadas largas…" }, { k: "items_en", label: "Datos (inglés)", tipo: "textarea", ph: "~22 kHz | Long calls…" }] }],
+      ayuda: "Un dato por renglón, con el formato: número o valor | descripción. Se muestran como recuadros." },
+    boton: { nombre: "Botón", campos: [
+      { fila: [{ k: "texto_es", label: "Texto del botón (español)" }, { k: "texto_en", label: "Texto del botón (inglés)" }] },
+      { k: "url", label: "Enlace", tipo: "url", ph: "https://... o ribio.html" }] }
+  };
   var GH_KEY = "nn-admin-github";
   var DATA_PATH = "data/contenido.js";
   var DEFAULT_REPO = { owner: "chinocapo211", repo: "PaginaInvestigacion", branch: "main" };
@@ -12,24 +36,26 @@
   /* ---------- Listas editables ---------- */
   var SECCIONES = {
     lineas: {
-      titulo: "Líneas de investigación", singular: "línea",
-      ayuda: "Las líneas destacadas (★) aparecen en la portada; se recomiendan 3. Si hay más líneas que destacadas, la portada muestra el botón “Ver todas las líneas”.",
+      titulo: "Líneas de investigación", singular: "línea", destacable: true, ancho: true,
+      ayuda: "Cada línea tiene su propia página. Las destacadas (★) aparecen en la portada; se recomiendan 3. Si hay más líneas que destacadas, la portada muestra el botón “Ver todas las líneas”.",
       campos: [
-        { k: "titulo_es", label: "Título (español)", req: true },
-        { k: "titulo_en", label: "Título (inglés)" },
+        { seccion: "Tarjeta (lo que se ve en la portada y en la lista de líneas)" },
+        { fila: [
+          { k: "titulo_es", label: "Título (español)", req: true },
+          { k: "titulo_en", label: "Título (inglés)" }
+        ] },
         { fila: [
           { k: "corto_es", label: "Nombre corto (español)", ph: "Ultrasonidos", ayuda: "Se usa en el pie de página y en las tarjetas de personas." },
           { k: "corto_en", label: "Nombre corto (inglés)", ph: "Ultrasonics" }
         ] },
-        { k: "resumen_es", label: "Resumen (español)", tipo: "textarea", req: true, ayuda: "El texto corto de la tarjeta." },
-        { k: "resumen_en", label: "Resumen (inglés)", tipo: "textarea" },
-        { k: "imagen", label: "Imagen", tipo: "imagen", carpeta: "lineas", max: 1400, cuadrada: false },
-        { tipo: "nota", si: function (l) { return !!l.pagina; },
-          texto: "Esta línea tiene una página propia diseñada a mano. Su contenido largo se cambia en el código; desde acá se edita la tarjeta." },
-        { k: "descripcion_es", label: "Texto de la página (español)", tipo: "textarea", grande: true, si: function (l) { return !l.pagina; },
-          ayuda: "Para separar párrafos, dejá una línea en blanco." },
-        { k: "descripcion_en", label: "Texto de la página (inglés)", tipo: "textarea", grande: true, si: function (l) { return !l.pagina; } },
-        { k: "destacada", label: "Destacada: mostrar en la portada", tipo: "check" }
+        { fila: [
+          { k: "resumen_es", label: "Resumen (español)", tipo: "textarea", req: true, ayuda: "Texto corto de la tarjeta. También aparece arriba de todo en la página de la línea." },
+          { k: "resumen_en", label: "Resumen (inglés)", tipo: "textarea" }
+        ] },
+        { k: "imagen", label: "Imagen de portada", tipo: "imagen", carpeta: "lineas", max: 1600, cuadrada: false, ayuda: "Aparece en la tarjeta y arriba de la página." },
+        { k: "destacada", label: "★ Destacada: mostrar en la portada", tipo: "check" },
+        { seccion: "Página de la línea" },
+        { k: "contenido", tipo: "bloques", carpeta: "lineas" }
       ],
       resumen: function (l) { return [l.titulo_es, l.corto_es || ""]; },
       thumb: function (l) { return { foto: l.imagen, texto: "", cuadrada: true }; },
@@ -62,20 +88,33 @@
       }
     },
     noticias: {
-      titulo: "Noticias", singular: "noticia",
-      ayuda: "La primera de la lista es la que aparece en la portada. Todas aparecen en la página de noticias, en este orden. Usá las flechas para cambiar cuál va primero.",
+      titulo: "Noticias", singular: "noticia", destacable: true, ancho: true,
+      ayuda: "Cada noticia tiene su propia página. Las destacadas (★) aparecen en la portada; el resto se ve con el botón “Ver todas las noticias”. En la lista de noticias se muestran en este orden (usá las flechas para ordenarlas).",
       campos: [
+        { seccion: "Tarjeta (lo que se ve en la portada y en la lista de noticias)" },
         { k: "fecha", label: "Fecha", ph: "Marzo 2026", req: true },
-        { k: "titulo_es", label: "Título (español)", req: true },
-        { k: "titulo_en", label: "Título (inglés)", ayuda: "Si queda vacío, se usa el título en español." },
-        { k: "texto_es", label: "Texto (español)", tipo: "textarea" },
-        { k: "texto_en", label: "Texto (inglés)", tipo: "textarea" },
-        { k: "enlace", label: "Enlace “Más información” (opcional)", tipo: "url", ph: "https://... o ribio.html" }
+        { fila: [
+          { k: "titulo_es", label: "Título (español)", req: true },
+          { k: "titulo_en", label: "Título (inglés)", ayuda: "Si queda vacío, se usa el título en español." }
+        ] },
+        { fila: [
+          { k: "texto_es", label: "Resumen (español)", tipo: "textarea", ayuda: "Texto corto de la tarjeta. También aparece arriba de todo en la página de la noticia." },
+          { k: "texto_en", label: "Resumen (inglés)", tipo: "textarea" }
+        ] },
+        { k: "imagen", label: "Imagen de portada (opcional)", tipo: "imagen", carpeta: "noticias", max: 1600, cuadrada: false, ayuda: "Aparece en la tarjeta y arriba de la página." },
+        { k: "destacada", label: "★ Destacada: mostrar en la portada", tipo: "check" },
+        { seccion: "Página de la noticia" },
+        { k: "contenido", tipo: "bloques", carpeta: "noticias" }
       ],
       resumen: function (n) { return [n.titulo_es, n.fecha]; },
-      etiqueta: function (n, i) { return i === 0 ? { t: "En portada", cls: "star" } : null; },
-      donde: function (n, i) {
-        return [i === 0 ? ["Portada", "index.html#noticia-" + n.id] : null, ["Página de noticias", "noticias.html#noticia-" + n.id]];
+      thumb: function (n) { return { foto: n.imagen, texto: "", cuadrada: true }; },
+      etiqueta: function (n) { return n.destacada ? { t: "★ Destacada", cls: "star" } : { t: "No destacada", cls: "muted" }; },
+      donde: function (n) {
+        return [
+          n.destacada ? ["Portada", "index.html#noticia-" + n.id] : null,
+          ["Todas las noticias", "noticias.html#noticia-" + n.id],
+          ["Su página", noticiaUrl(n)]
+        ];
       }
     },
     publicaciones: {
@@ -200,13 +239,10 @@
 
   // Quita de la lista de pendientes las fotos nuevas que ya nadie usa
   function limpiarImagenes() {
-    var usadas = {};
-    Object.keys(SECCIONES).forEach(function (k) {
-      var claves = camposPlanos(SECCIONES[k].campos).filter(function (c) { return c.tipo === "imagen"; }).map(function (c) { return c.k; });
-      state.data[k].forEach(function (it) { claves.forEach(function (c) { if (it[c]) usadas[it[c]] = true; }); });
+    var texto = JSON.stringify(state.data) + (edicion ? JSON.stringify(edicion.item) : "");
+    Object.keys(state.imagenes).forEach(function (p) {
+      if (texto.indexOf(JSON.stringify(p)) === -1) delete state.imagenes[p];
     });
-    if (edicion) Object.keys(edicion.item).forEach(function (k) { usadas[edicion.item[k]] = true; });
-    Object.keys(state.imagenes).forEach(function (p) { if (!usadas[p]) delete state.imagenes[p]; });
   }
 
   function guardarBorrador() {
@@ -267,6 +303,7 @@
     pill.className = "adm-pill " + (dirty ? "dirty" : "ok");
     $("#btn-descartar").hidden = !dirty;
     $("#btn-publicar").disabled = !dirty;
+    $("#nota-borrador").hidden = !dirty;
   }
 
   /* ---------- Pestañas ---------- */
@@ -327,7 +364,7 @@
           (r[1] ? '<span class="adm-sub">' + esc(r[1]) + "</span>" : "") +
           (sec.donde ? dondeHtml(sec.donde(it, i)) : "") + "</div>" +
           '<div class="adm-actions">' +
-          (tab === "lineas" ? '<button type="button" class="adm-btn small ghost" data-accion="destacar" data-i="' + i + '">' + (it.destacada ? "Quitar de portada" : "★ Destacar") + "</button>" : "") +
+          (sec.destacable ? '<button type="button" class="adm-btn small ghost" data-accion="destacar" data-i="' + i + '">' + (it.destacada ? "Quitar de portada" : "★ Destacar") + "</button>" : "") +
           '<button type="button" class="adm-btn small ghost" data-accion="subir" data-i="' + i + '" title="Mover arriba" aria-label="Mover arriba"' + (i === 0 ? " disabled" : "") + ">↑</button>" +
           '<button type="button" class="adm-btn small ghost" data-accion="bajar" data-i="' + i + '" title="Mover abajo" aria-label="Mover abajo"' + (i === lista.length - 1 ? " disabled" : "") + ">↓</button>" +
           '<button type="button" class="adm-btn small" data-accion="editar" data-i="' + i + '">Editar</button>' +
@@ -369,14 +406,22 @@
   /* ---------- Campos de formulario ---------- */
   function campoHtml(c, item) {
     if (!campoVisible(c, item)) return "";
+    if (c.seccion) return '<h3 class="adm-sec">' + esc(c.seccion) + "</h3>";
     if (c.tipo === "nota") return '<p class="adm-note">' + esc(c.texto) + "</p>";
+    if (c.tipo === "bloques") {
+      return '<div class="adm-field"><p class="adm-help">Armá la página con bloques. Se muestran en este orden; usá las flechas para moverlos.</p>' +
+        '<div class="adm-blocks" data-bloques="' + c.k + '"></div>' +
+        '<div class="adm-add"><span>Agregar:</span>' + Object.keys(TIPOS_BLOQUE).map(function (t) {
+          return '<button type="button" class="adm-btn small" data-add-bloque="' + t + '">+ ' + esc(TIPOS_BLOQUE[t].nombre) + "</button>";
+        }).join("") + "</div></div>";
+    }
     var v = item[c.k];
     var id = "f-" + c.k;
     var label = esc(c.label) + (c.req ? ' <span class="req">*</span>' : "");
     var ayuda = c.ayuda ? "<small>" + esc(c.ayuda) + "</small>" : "";
     if (c.tipo === "textarea") {
       return '<div class="adm-field"><label for="' + id + '">' + label + '</label><textarea id="' + id + '" name="' + c.k + '"' +
-        (c.grande ? ' class="grande"' : "") + ">" + esc(v) + "</textarea>" + ayuda + "</div>";
+        (c.grande ? ' class="grande"' : "") + (c.ph ? ' placeholder="' + esc(c.ph) + '"' : "") + ">" + esc(v) + "</textarea>" + ayuda + "</div>";
     }
     if (c.tipo === "check") {
       return '<div class="adm-field"><div class="adm-checks"><label><input type="checkbox" name="' + c.k + '"' + (v ? " checked" : "") + "> " +
@@ -439,15 +484,20 @@
   function abrirEditor(tab, index) {
     var sec = SECCIONES[tab];
     var item = index >= 0 ? clone(state.data[tab][index]) : { id: nuevoId() };
-    if (tab === "lineas" && index < 0) item.destacada = false;
+    if (sec.destacable && index < 0) item.destacada = false;
     edicion = { tab: tab, index: index, item: item };
     $("#editor-titulo").textContent = (index >= 0 ? "Editar " : "Agregar ") + sec.singular;
     $("#editor-campos").innerHTML = camposHtml(sec.campos, item);
     $("#editor-error").hidden = true;
 
-    camposPlanos(sec.campos).filter(function (c) { return c.tipo === "imagen"; }).forEach(prepararImagen);
+    camposPlanos(sec.campos).forEach(function (c) {
+      if (c.tipo === "imagen") prepararImagen(c);
+      if (c.tipo === "bloques") prepararBloques(c);
+    });
 
     var dlg = $("#editor");
+    dlg.classList.toggle("wide", !!sec.ancho);
+    $("#editor-form").scrollTop = 0;
     dlg.showModal();
     var primero = dlg.querySelector("input[type=text], textarea");
     if (primero) primero.focus();
@@ -468,20 +518,122 @@
     box.querySelector("[data-file]").addEventListener("change", function (ev) {
       var file = ev.target.files && ev.target.files[0];
       if (!file) return;
-      achicarImagen(file, c.max || 1200).then(function (dataUrl) {
-        var form = $("#editor-form");
-        var el = form.elements.nombre || form.elements.titulo_es || form.elements.texto_es;
-        var base = (el && el.value) || file.name.replace(/\.[^.]+$/, "");
-        var path = "assets/img/" + c.carpeta + "/" + slug(base) + "-" + Date.now().toString(36) + ".jpg";
-        state.imagenes[path] = dataUrl;
+      cargarImagen(file, c.max || 1200, c.carpeta).then(function (path) {
         hidden.value = path;
         edicion.item[c.k + "__pendiente"] = path; // para que no se descarte antes de guardar
         pintar();
-      }).catch(function () {
-        alert("No se pudo leer esa imagen. Probá con un JPG o PNG.");
       });
       ev.target.value = "";
     });
+  }
+
+  // Achica la imagen elegida y la deja pendiente de subir; devuelve la ruta que tendrá en el sitio
+  function cargarImagen(file, max, carpeta) {
+    return achicarImagen(file, max).then(function (dataUrl) {
+      var form = $("#editor-form");
+      var el = form.elements.nombre || form.elements.titulo_es || form.elements.texto_es;
+      var base = (el && el.value) || file.name.replace(/\.[^.]+$/, "");
+      var path = "assets/img/" + carpeta + "/" + slug(base) + "-" + Date.now().toString(36) + ".jpg";
+      state.imagenes[path] = dataUrl;
+      return path;
+    }).catch(function (e) {
+      alert("No se pudo leer esa imagen. Probá con un JPG o PNG.");
+      throw e;
+    });
+  }
+
+  /* ---------- Editor de bloques (contenido de la página) ---------- */
+  function prepararBloques(c) {
+    var cont = document.querySelector('[data-bloques="' + c.k + '"]');
+    var form = $("#editor-form");
+    if (!Array.isArray(edicion.item[c.k])) edicion.item[c.k] = [];
+    var lista = edicion.item[c.k];
+
+    function campoBloque(f, b, i) {
+      var v = b[f.k] || "";
+      var attrs = ' data-b="' + i + '" data-f="' + f.k + '"';
+      if (f.tipo === "imagen") {
+        var u = urlImagen(v);
+        return '<div class="adm-field"><div class="adm-image">' +
+          '<div class="adm-thumb square">' + (u ? '<img src="' + esc(u) + '" alt="">' : "—") + "</div>" +
+          '<label class="adm-btn small">' + (v ? "Cambiar imagen…" : "Elegir imagen…") + '<input type="file" accept="image/*" hidden data-b-file="' + i + '"></label>' +
+          "</div></div>";
+      }
+      var input = f.tipo === "textarea"
+        ? "<textarea" + attrs + (f.ph ? ' placeholder="' + esc(f.ph) + '"' : "") + ">" + esc(v) + "</textarea>"
+        : '<input type="text"' + attrs + ' value="' + esc(v) + '"' + (f.ph ? ' placeholder="' + esc(f.ph) + '"' : "") + ">";
+      return '<div class="adm-field"><label>' + esc(f.label) + "</label>" + input + "</div>";
+    }
+
+    function pintar() {
+      if (!lista.length) {
+        cont.innerHTML = '<p class="adm-empty">La página todavía no tiene contenido. Agregá bloques con los botones de abajo.</p>';
+        return;
+      }
+      cont.innerHTML = lista.map(function (b, i) {
+        var t = TIPOS_BLOQUE[b.tipo];
+        if (!t) return "";
+        return '<div class="adm-block">' +
+          '<div class="adm-block-head"><strong>' + esc(t.nombre) + "</strong>" +
+          '<span class="adm-actions">' +
+          '<button type="button" class="adm-btn small ghost" data-b-mover="-1" data-b-i="' + i + '" aria-label="Subir bloque"' + (i === 0 ? " disabled" : "") + ">↑</button>" +
+          '<button type="button" class="adm-btn small ghost" data-b-mover="1" data-b-i="' + i + '" aria-label="Bajar bloque"' + (i === lista.length - 1 ? " disabled" : "") + ">↓</button>" +
+          '<button type="button" class="adm-btn small danger" data-b-borrar="' + i + '">Quitar</button>' +
+          "</span></div>" +
+          t.campos.map(function (f) {
+            if (f.fila) return '<div class="adm-row">' + f.fila.map(function (x) { return campoBloque(x, b, i); }).join("") + "</div>";
+            return campoBloque(f, b, i);
+          }).join("") +
+          (t.ayuda ? '<small class="adm-block-help">' + esc(t.ayuda) + "</small>" : "") +
+          "</div>";
+      }).join("");
+    }
+
+    cont.addEventListener("input", function (ev) {
+      var el = ev.target;
+      if (!el.hasAttribute("data-b")) return;
+      lista[Number(el.getAttribute("data-b"))][el.getAttribute("data-f")] = el.value;
+    });
+    cont.addEventListener("change", function (ev) {
+      var el = ev.target;
+      if (!el.hasAttribute("data-b-file")) return;
+      var i = Number(el.getAttribute("data-b-file"));
+      var file = el.files && el.files[0];
+      if (!file) return;
+      cargarImagen(file, 1600, c.carpeta).then(function (path) {
+        lista[i].src = path;
+        delete lista[i].src_en; // la versión en inglés era de la imagen anterior
+        pintar();
+      });
+    });
+    cont.addEventListener("click", function (ev) {
+      var mover = ev.target.closest("[data-b-mover]");
+      var borrar = ev.target.closest("[data-b-borrar]");
+      if (mover) {
+        var i = Number(mover.getAttribute("data-b-i")), j = i + Number(mover.getAttribute("data-b-mover"));
+        lista.splice(j, 0, lista.splice(i, 1)[0]);
+        pintar();
+      } else if (borrar) {
+        var k = Number(borrar.getAttribute("data-b-borrar"));
+        if (!confirm("¿Quitar este bloque?")) return;
+        lista.splice(k, 1);
+        pintar();
+      }
+    });
+    form.querySelectorAll("[data-add-bloque]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        lista.push({ tipo: btn.getAttribute("data-add-bloque") });
+        pintar();
+        var bloques = cont.querySelectorAll(".adm-block");
+        var ultimo = bloques[bloques.length - 1];
+        if (ultimo) {
+          ultimo.scrollIntoView({ block: "center", behavior: "smooth" });
+          var campo = ultimo.querySelector("input[type=text], textarea");
+          if (campo) campo.focus({ preventScroll: true });
+        }
+      });
+    });
+    pintar();
   }
 
   // Achica la foto en el navegador para que el sitio cargue rápido
@@ -508,9 +660,10 @@
     });
   }
 
-  function idLineaUnico(titulo, propio) {
-    var base = slug(titulo) || "linea", id = base, n = 2;
-    while (state.data.lineas.some(function (l) { return l.id === id && l !== propio; })) id = base + "-" + n++;
+  // Id legible para la dirección de la página (linea.html?id=..., noticia.html?id=...)
+  function idUnico(lista, titulo, propio) {
+    var base = slug(titulo) || "pagina", id = base, n = 2;
+    while (lista.some(function (x) { return x.id === id && x !== propio; })) id = base + "-" + n++;
     return id;
   }
 
@@ -527,7 +680,7 @@
       return;
     }
     Object.keys(item).forEach(function (k) { if (/__pendiente$/.test(k)) delete item[k]; });
-    if (edicion.tab === "lineas" && edicion.index < 0) item.id = idLineaUnico(item.titulo_es, item);
+    if (sec.destacable && edicion.index < 0) item.id = idUnico(state.data[edicion.tab], item.titulo_es, item);
     if (edicion.index >= 0) state.data[edicion.tab][edicion.index] = item;
     else state.data[edicion.tab].push(item);
     $("#editor").close();
