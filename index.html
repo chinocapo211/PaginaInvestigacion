@@ -142,7 +142,7 @@
         <span class="eyebrow"><span lang="es">Investigación</span><span lang="en">Research</span></span>
         <h2><span lang="es">Líneas de investigación</span><span lang="en">Research lines</span></h2>
       </div>
-      <div class="lines">
+      <div class="lines" data-render="lineas-destacadas">
         <a class="line-card" href="linea-ultrasonidos.html">
           <div class="thumb"><img src="assets/img/linea-ultrasonidos.jpg" alt="Rata emitiendo vocalizaciones ultrasónicas captadas por un micrófono ultrasónico" loading="lazy"></div>
           <div class="body">
@@ -177,6 +177,7 @@
           </div>
         </a>
       </div>
+      <div class="section-more" data-render="lineas-mas"></div>
     </div>
   </section>
 
@@ -301,7 +302,7 @@
         <span class="eyebrow"><span lang="es">Novedades</span><span lang="en">Updates</span></span>
         <h2><span lang="es">Noticias</span><span lang="en">News</span></h2>
       </div>
-      <div class="news" data-render="noticias">
+      <div class="news featured" data-render="noticias" data-limite="1">
         <article class="news-item">
           <time datetime="2026">2026</time>
           <h3><span lang="es">Abre la inscripción a RIBio</span><span lang="en">RIBio enrollment is open</span></h3>
@@ -316,6 +317,7 @@
           <p><span lang="es">Breve descripción de la novedad.</span><span lang="en">Short description of the update.</span></p>
         </article>
       </div>
+      <div class="section-more" data-render="noticias-mas"><a class="btn" href="noticias.html"><span lang="es">Ver todas las noticias</span><span lang="en">See all news</span></a></div>
     </div>
   </section>
 
@@ -343,7 +345,7 @@
         <h2><span lang="es">Contacto</span><span lang="en">Contact</span></h2>
       </div>
       <div class="contact">
-        <dl>
+        <dl data-render="contacto">
           <dt><span lang="es">Dirección</span><span lang="en">Address</span></dt>
           <dd>
             <span lang="es">Departamento de Investigación y Doctorado</span><span lang="en">Research and Doctorate Department</span><br>
@@ -355,7 +357,7 @@
           <dt><span lang="es">Cursos de doctorado</span><span lang="en">Doctoral courses</span></dt>
           <dd><a href="https://investigacion.itba.edu.ar/cursos-de-doctorado/" target="_blank" rel="noopener">investigacion.itba.edu.ar</a></dd>
         </dl>
-        <iframe class="map" title="Mapa: Iguazú 341, Buenos Aires" loading="lazy"
+        <iframe class="map" data-render="mapa" title="Mapa: Iguazú 341, Buenos Aires" loading="lazy"
                 src="https://www.google.com/maps?q=Igua%C3%BAz%C3%BA+341,+Buenos+Aires,+Argentina&output=embed"></iframe>
       </div>
     </div>
@@ -368,7 +370,7 @@
     <div class="footer-grid">
       <div>
         <h4><span lang="es">Laboratorio de Navegación &amp; Neurocognición</span><span lang="en">Navigation &amp; Neurocognition Laboratory</span></h4>
-        <address>
+        <address data-render="direccion">
           <span lang="es">Departamento de Investigación y Doctorado</span><span lang="en">Research and Doctorate Department</span><br>
           <span lang="es">Instituto Tecnológico de Buenos Aires (ITBA)</span><span lang="en">Buenos Aires Institute of Technology (ITBA)</span><br>
           Iguazú 341<br>
@@ -378,7 +380,7 @@
       </div>
       <div>
         <h4><span lang="es">Investigación</span><span lang="en">Research</span></h4>
-        <ul>
+        <ul data-render="lineas-footer">
           <li><a href="linea-ultrasonidos.html"><span lang="es">Vocalizaciones ultrasónicas</span><span lang="en">Ultrasonic vocalizations</span></a></li>
           <li><a href="linea-desorientacion.html"><span lang="es">Desorientación espacial</span><span lang="en">Spatial disorientation</span></a></li>
           <li><a href="linea-navegacion.html"><span lang="es">Ecología del movimiento</span><span lang="en">Movement ecology</span></a></li>
@@ -388,7 +390,7 @@
         <h4><span lang="es">Formación</span><span lang="en">Training</span></h4>
         <ul>
           <li><a href="ribio.html">RIBio</a></li>
-          <li><a href="https://investigacion.itba.edu.ar/cursos-de-doctorado/" target="_blank" rel="noopener"><span lang="es">Cursos de doctorado ITBA</span><span lang="en">ITBA doctoral courses</span></a></li>
+          <li><a data-render="cursos-link" href="https://investigacion.itba.edu.ar/cursos-de-doctorado/" target="_blank" rel="noopener"><span lang="es">Cursos de doctorado ITBA</span><span lang="en">ITBA doctoral courses</span></a></li>
         </ul>
       </div>
     </div>

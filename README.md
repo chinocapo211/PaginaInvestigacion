@@ -12,6 +12,9 @@ Se puede publicar directamente con GitHub Pages (Settings → Pages → rama y c
 | `linea-ultrasonidos.html` | Vocalizaciones ultrasónicas y dinámica de la memoria |
 | `linea-desorientacion.html` | Desorientación espacial e integración de trayectoria |
 | `linea-navegacion.html` | Ecología del movimiento y eficiencia de navegación |
+| `lineas.html` | Todas las líneas de investigación (botón "Ver todas las líneas" de la portada) |
+| `linea.html?id=...` | Página de las líneas creadas desde el panel |
+| `noticias.html` | Todas las noticias (botón "Ver todas las noticias" de la portada) |
 | `admin.html` | Panel de administración (link "Admin" en el pie de página) |
 
 ## Idiomas (español / inglés)
@@ -27,8 +30,13 @@ Al editar un texto, cambiar ambas versiones.
 
 ## Panel de administración (`admin.html`)
 
-Personas, noticias, publicaciones, subsidios, fotos de "Vida del lab", email de contacto y los recuadros
-amarillos de "Contenido de ejemplo" se editan desde el panel, sin tocar código.
+Líneas de investigación, personas, noticias, publicaciones, subsidios, fotos de "Vida del lab", datos de contacto
+y los recuadros amarillos de "Contenido de ejemplo" se editan desde el panel, sin tocar código.
+
+- **Líneas destacadas:** las marcadas con ★ salen en la portada (se recomiendan 3). Si hay más líneas que destacadas,
+  aparece el botón "Ver todas las líneas". Las 3 líneas originales tienen página propia escrita a mano; las nuevas usan `linea.html`.
+- **Noticias:** la portada muestra solo la primera de la lista; el resto está en `noticias.html`.
+- Cada elemento del panel muestra dónde aparece en el sitio, con un link que lleva directo a él.
 
 - Los datos viven en `data/contenido.js`. Las páginas los dibujan con `assets/js/contenido.js` en los
   bloques marcados con `data-render="..."` (el HTML que queda adentro solo se ve si los datos no cargan).

@@ -2,14 +2,46 @@
 (function () {
   "use strict";
 
-  var LINEAS = window.SITE_LINEAS || [];
   var DRAFT_KEY = window.SITE_DRAFT_KEY || "nn-admin-borrador";
+  var normalizar = window.SITE_NORMALIZAR;
+  var lineaUrl = window.SITE_LINEA_URL;
   var GH_KEY = "nn-admin-github";
   var DATA_PATH = "data/contenido.js";
   var DEFAULT_REPO = { owner: "chinocapo211", repo: "PaginaInvestigacion", branch: "main" };
 
-  /* ---------- Qué se puede editar ---------- */
+  /* ---------- Listas editables ---------- */
   var SECCIONES = {
+    lineas: {
+      titulo: "Líneas de investigación", singular: "línea",
+      ayuda: "Las líneas destacadas (★) aparecen en la portada; se recomiendan 3. Si hay más líneas que destacadas, la portada muestra el botón “Ver todas las líneas”.",
+      campos: [
+        { k: "titulo_es", label: "Título (español)", req: true },
+        { k: "titulo_en", label: "Título (inglés)" },
+        { fila: [
+          { k: "corto_es", label: "Nombre corto (español)", ph: "Ultrasonidos", ayuda: "Se usa en el pie de página y en las tarjetas de personas." },
+          { k: "corto_en", label: "Nombre corto (inglés)", ph: "Ultrasonics" }
+        ] },
+        { k: "resumen_es", label: "Resumen (español)", tipo: "textarea", req: true, ayuda: "El texto corto de la tarjeta." },
+        { k: "resumen_en", label: "Resumen (inglés)", tipo: "textarea" },
+        { k: "imagen", label: "Imagen", tipo: "imagen", carpeta: "lineas", max: 1400, cuadrada: false },
+        { tipo: "nota", si: function (l) { return !!l.pagina; },
+          texto: "Esta línea tiene una página propia diseñada a mano. Su contenido largo se cambia en el código; desde acá se edita la tarjeta." },
+        { k: "descripcion_es", label: "Texto de la página (español)", tipo: "textarea", grande: true, si: function (l) { return !l.pagina; },
+          ayuda: "Para separar párrafos, dejá una línea en blanco." },
+        { k: "descripcion_en", label: "Texto de la página (inglés)", tipo: "textarea", grande: true, si: function (l) { return !l.pagina; } },
+        { k: "destacada", label: "Destacada: mostrar en la portada", tipo: "check" }
+      ],
+      resumen: function (l) { return [l.titulo_es, l.corto_es || ""]; },
+      thumb: function (l) { return { foto: l.imagen, texto: "", cuadrada: true }; },
+      etiqueta: function (l) { return l.destacada ? { t: "★ Destacada", cls: "star" } : { t: "No destacada", cls: "muted" }; },
+      donde: function (l) {
+        return [
+          l.destacada ? ["Portada", "index.html#linea-" + l.id] : null,
+          ["Todas las líneas", "lineas.html#linea-" + l.id],
+          ["Su página", lineaUrl(l)]
+        ];
+      }
+    },
     personas: {
       titulo: "Personas", singular: "persona",
       ayuda: "Integrantes del laboratorio. Aparecen en la portada y en la página de cada línea de investigación que tengan marcada.",
@@ -23,12 +55,15 @@
         { k: "linkedin", label: "Enlace a LinkedIn u otro perfil", tipo: "url", ph: "https://www.linkedin.com/in/..." },
         { k: "lineas", label: "Líneas de investigación", tipo: "lineas" }
       ],
-      resumen: function (p) { return [p.nombre, [p.rol_es, nombresLineas(p.lineas)].filter(Boolean).join(" · ")]; },
-      thumb: function (p) { return { foto: p.foto, texto: iniciales(p.nombre) }; }
+      resumen: function (p) { return [p.nombre, p.rol_es]; },
+      thumb: function (p) { return { foto: p.foto, texto: iniciales(p.nombre) }; },
+      donde: function (p) {
+        return [["Portada", "index.html#persona-" + p.id]].concat(enLineas(p, "persona-" + p.id));
+      }
     },
     noticias: {
       titulo: "Noticias", singular: "noticia",
-      ayuda: "Se muestran en la portada en este orden (la primera de la lista aparece primero).",
+      ayuda: "La primera de la lista es la que aparece en la portada. Todas aparecen en la página de noticias, en este orden. Usá las flechas para cambiar cuál va primero.",
       campos: [
         { k: "fecha", label: "Fecha", ph: "Marzo 2026", req: true },
         { k: "titulo_es", label: "Título (español)", req: true },
@@ -37,7 +72,11 @@
         { k: "texto_en", label: "Texto (inglés)", tipo: "textarea" },
         { k: "enlace", label: "Enlace “Más información” (opcional)", tipo: "url", ph: "https://... o ribio.html" }
       ],
-      resumen: function (n) { return [n.titulo_es, n.fecha]; }
+      resumen: function (n) { return [n.titulo_es, n.fecha]; },
+      etiqueta: function (n, i) { return i === 0 ? { t: "En portada", cls: "star" } : null; },
+      donde: function (n, i) {
+        return [i === 0 ? ["Portada", "index.html#noticia-" + n.id] : null, ["Página de noticias", "noticias.html#noticia-" + n.id]];
+      }
     },
     publicaciones: {
       titulo: "Publicaciones", singular: "publicación",
@@ -52,7 +91,10 @@
         { k: "revista", label: "Revista" },
         { k: "lineas", label: "Líneas de investigación", tipo: "lineas" }
       ],
-      resumen: function (p) { return [p.titulo, [p.anio, p.autores].filter(Boolean).join(" · ")]; }
+      resumen: function (p) { return [p.titulo, [p.anio, p.autores].filter(Boolean).join(" · ")]; },
+      donde: function (p) {
+        return [["Portada", "index.html#pub-" + p.id]].concat(enLineas(p, "pub-" + p.id));
+      }
     },
     subsidios: {
       titulo: "Subsidios", singular: "subsidio",
@@ -65,7 +107,8 @@
         { k: "titulo", label: "Título del proyecto", req: true },
         { k: "responsable", label: "Responsable" }
       ],
-      resumen: function (s) { return [s.titulo, [s.periodo, s.entidad].filter(Boolean).join(" · ")]; }
+      resumen: function (s) { return [s.titulo, [s.periodo, s.entidad].filter(Boolean).join(" · ")]; },
+      donde: function (s) { return [["Portada", "index.html#subsidio-" + s.id]]; }
     },
     galeria: {
       titulo: "Vida del lab", singular: "foto",
@@ -76,13 +119,52 @@
         { k: "texto_en", label: "Descripción (inglés)" }
       ],
       resumen: function (g) { return [g.texto_es, g.foto ? "Con foto" : "Sin foto"]; },
-      thumb: function (g) { return { foto: g.foto, texto: "", cuadrada: true }; }
+      thumb: function (g) { return { foto: g.foto, texto: "", cuadrada: true }; },
+      donde: function (g) { return [["Portada", "index.html#foto-" + g.id]]; }
+    }
+  };
+
+  /* ---------- Formularios simples (un solo objeto) ---------- */
+  var OBJETOS = {
+    contacto: {
+      titulo: "Contacto",
+      ayuda: "Aparece en la sección Contacto de la portada y en el pie de todas las páginas.",
+      donde: [["Contacto en la portada", "index.html#contacto"]],
+      campos: [
+        { k: "email", label: "Email", ph: "laboratorio@itba.edu.ar" },
+        { fila: [
+          { k: "departamento_es", label: "Departamento (español)" },
+          { k: "departamento_en", label: "Departamento (inglés)" }
+        ] },
+        { fila: [
+          { k: "institucion_es", label: "Institución (español)" },
+          { k: "institucion_en", label: "Institución (inglés)" }
+        ] },
+        { fila: [
+          { k: "calle", label: "Calle y número", ph: "Iguazú 341" },
+          { k: "codigoPostal", label: "Código postal", ph: "(1437)" }
+        ] },
+        { fila: [
+          { k: "ciudad_es", label: "Ciudad y país (español)" },
+          { k: "ciudad_en", label: "Ciudad y país (inglés)" }
+        ] },
+        { k: "mapa", label: "Dirección para el mapa", ayuda: "Lo que se busca en Google Maps para mostrar el mapa. Si queda vacío, se usan la calle y la ciudad." },
+        { k: "cursosUrl", label: "Enlace a cursos de doctorado", tipo: "url" }
+      ]
+    },
+    ajustes: {
+      titulo: "Ajustes",
+      ayuda: "Opciones generales del sitio.",
+      campos: [
+        { k: "mostrarAvisosEjemplo", tipo: "check", label: "Mostrar los recuadros amarillos de “Contenido de ejemplo”",
+          ayuda: "Desmarcalo cuando hayas reemplazado el contenido de ejemplo por el real." }
+      ]
     }
   };
 
   /* ---------- Estado ---------- */
   var state = { data: null, base: "", imagenes: {} };
-  var tabActual = "personas";
+  var tabActual = "lineas";
   var $ = function (sel) { return document.querySelector(sel); };
 
   function clone(o) { return JSON.parse(JSON.stringify(o)); }
@@ -94,25 +176,23 @@
     var p = String(n || "").trim().split(/\s+/).filter(Boolean);
     return p.length ? (p[0][0] + (p.length > 1 ? p[p.length - 1][0] : "")).toUpperCase() : "?";
   }
-  function nombresLineas(ids) {
-    return (ids || []).map(function (id) {
-      var l = LINEAS.filter(function (x) { return x.id === id; })[0];
-      return l ? l.corto_es : null;
-    }).filter(Boolean).join(", ");
-  }
   function slug(s) {
     return String(s || "foto").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase()
       .replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 40) || "foto";
   }
-
-  function normalizar(d) {
-    d = d ? clone(d) : {};
-    d.ajustes = d.ajustes || {};
-    if (d.ajustes.mostrarAvisosEjemplo === undefined) d.ajustes.mostrarAvisosEjemplo = true;
-    if (d.ajustes.email === undefined) d.ajustes.email = "";
-    Object.keys(SECCIONES).forEach(function (k) { if (!Array.isArray(d[k])) d[k] = []; });
-    return d;
+  function lineaById(id) { return state.data.lineas.filter(function (l) { return l.id === id; })[0] || null; }
+  function enLineas(item, ancla) {
+    return (item.lineas || []).map(function (id) {
+      var l = lineaById(id);
+      return l ? [l.corto_es || l.titulo_es, lineaUrl(l) + "#" + ancla] : null;
+    });
   }
+  function camposPlanos(campos) {
+    var out = [];
+    campos.forEach(function (c) { if (c.fila) out.push.apply(out, c.fila); else out.push(c); });
+    return out;
+  }
+  function campoVisible(c, item) { return !c.si || c.si(item); }
 
   function hayCambios() {
     return JSON.stringify(state.data) !== state.base || Object.keys(state.imagenes).length > 0;
@@ -122,8 +202,10 @@
   function limpiarImagenes() {
     var usadas = {};
     Object.keys(SECCIONES).forEach(function (k) {
-      state.data[k].forEach(function (it) { if (it.foto) usadas[it.foto] = true; });
+      var claves = camposPlanos(SECCIONES[k].campos).filter(function (c) { return c.tipo === "imagen"; }).map(function (c) { return c.k; });
+      state.data[k].forEach(function (it) { claves.forEach(function (c) { if (it[c]) usadas[it[c]] = true; }); });
     });
+    if (edicion) Object.keys(edicion.item).forEach(function (k) { usadas[edicion.item[k]] = true; });
     Object.keys(state.imagenes).forEach(function (p) { if (!usadas[p]) delete state.imagenes[p]; });
   }
 
@@ -155,7 +237,7 @@
         state.imagenes = borrador.imagenes || {};
         if (conCambios) {
           aviso("info", "Se recuperaron cambios que todavía no publicaste" +
-            (borrador.guardado ? " (guardados el " + new Date(borrador.guardado).toLocaleString("es-AR") + ")" : "") + ".");
+            (borrador.guardado ? " (guardados el " + new Date(borrador.guardado).toLocaleString("es-AR", { dateStyle: "short", timeStyle: "short", hourCycle: "h23" }) + ")" : "") + ".");
           if (borrador.base !== publicadoJson) {
             aviso("warn", "Ojo: el sitio publicado cambió desde que empezaste estos cambios. Si publicás, se reemplaza por lo que ves acá.");
           }
@@ -194,7 +276,7 @@
       b.setAttribute("aria-current", b.getAttribute("data-tab") === tab ? "true" : "false");
     });
     if (SECCIONES[tab]) renderLista(tab);
-    else if (tab === "ajustes") renderAjustes();
+    else if (OBJETOS[tab]) renderObjeto(tab);
     else renderPublicacion();
     try { history.replaceState(null, "", "#" + tab); } catch (e) { /* file:// */ }
   }
@@ -202,6 +284,20 @@
   function urlImagen(path) {
     if (!path) return "";
     return state.imagenes[path] || path;
+  }
+
+  // Abre el sitio (con el borrador) en el lugar donde aparece cada cosa
+  function urlPreview(url) {
+    var m = url.match(/^([^?#]*)(\?[^#]*)?(#.*)?$/);
+    return m[1] + (m[2] ? m[2] + "&vista-previa" : "?vista-previa") + (m[3] || "");
+  }
+
+  function dondeHtml(lista) {
+    lista = (lista || []).filter(Boolean);
+    if (!lista.length) return "";
+    return '<span class="adm-where">Aparece en: ' + lista.map(function (d) {
+      return '<a href="' + esc(urlPreview(d[1])) + '" target="_blank" rel="noopener" data-ver>' + esc(d[0]) + " ↗</a>";
+    }).join("") + "</span>";
   }
 
   function thumbHtml(t) {
@@ -222,11 +318,16 @@
       html += '<p class="adm-empty">Todavía no hay nada cargado.</p>';
     } else {
       html += '<ol class="adm-list">' + lista.map(function (it, i) {
-        var r = sec.resumen(it);
+        var r = sec.resumen(it, i);
+        var tag = sec.etiqueta ? sec.etiqueta(it, i) : null;
         return '<li class="adm-item">' +
           (sec.thumb ? thumbHtml(sec.thumb(it)) : "") +
-          '<div class="adm-sum"><strong>' + esc(r[0] || "(sin título)") + "</strong><span>" + esc(r[1] || "") + "</span></div>" +
+          '<div class="adm-sum"><strong>' + esc(r[0] || "(sin título)") +
+          (tag ? ' <em class="adm-tag ' + tag.cls + '">' + esc(tag.t) + "</em>" : "") + "</strong>" +
+          (r[1] ? '<span class="adm-sub">' + esc(r[1]) + "</span>" : "") +
+          (sec.donde ? dondeHtml(sec.donde(it, i)) : "") + "</div>" +
           '<div class="adm-actions">' +
+          (tab === "lineas" ? '<button type="button" class="adm-btn small ghost" data-accion="destacar" data-i="' + i + '">' + (it.destacada ? "Quitar de portada" : "★ Destacar") + "</button>" : "") +
           '<button type="button" class="adm-btn small ghost" data-accion="subir" data-i="' + i + '" title="Mover arriba" aria-label="Mover arriba"' + (i === 0 ? " disabled" : "") + ">↑</button>" +
           '<button type="button" class="adm-btn small ghost" data-accion="bajar" data-i="' + i + '" title="Mover abajo" aria-label="Mover abajo"' + (i === lista.length - 1 ? " disabled" : "") + ">↓</button>" +
           '<button type="button" class="adm-btn small" data-accion="editar" data-i="' + i + '">Editar</button>' +
@@ -244,9 +345,18 @@
     if (accion === "agregar") return abrirEditor(tabActual, -1);
     if (accion === "editar") return abrirEditor(tabActual, i);
     if (accion === "borrar") {
-      var nombre = sec.resumen(lista[i])[0] || sec.singular;
-      if (!confirm("¿Eliminar “" + nombre + "”? Se quita del sitio cuando publiques.")) return;
+      var it = lista[i];
+      var nombre = sec.resumen(it)[0] || sec.singular;
+      var extra = tabActual === "lineas" ? " También se quita de las personas y publicaciones que la tengan marcada." : "";
+      if (!confirm("¿Eliminar “" + nombre + "”? Se quita del sitio cuando publiques." + extra)) return;
       lista.splice(i, 1);
+      if (tabActual === "lineas") {
+        ["personas", "publicaciones"].forEach(function (k) {
+          state.data[k].forEach(function (x) { x.lineas = (x.lineas || []).filter(function (id) { return id !== it.id; }); });
+        });
+      }
+    } else if (accion === "destacar") {
+      lista[i].destacada = !lista[i].destacada;
     } else if (accion === "subir" && i > 0) {
       lista.splice(i - 1, 0, lista.splice(i, 1)[0]);
     } else if (accion === "bajar" && i < lista.length - 1) {
@@ -256,23 +366,29 @@
     renderLista(tabActual);
   }
 
-  /* ---------- Editor (ventana con formulario) ---------- */
-  var edicion = null; // { tab, index, item }
-
+  /* ---------- Campos de formulario ---------- */
   function campoHtml(c, item) {
+    if (!campoVisible(c, item)) return "";
+    if (c.tipo === "nota") return '<p class="adm-note">' + esc(c.texto) + "</p>";
     var v = item[c.k];
     var id = "f-" + c.k;
     var label = esc(c.label) + (c.req ? ' <span class="req">*</span>' : "");
     var ayuda = c.ayuda ? "<small>" + esc(c.ayuda) + "</small>" : "";
     if (c.tipo === "textarea") {
-      return '<div class="adm-field"><label for="' + id + '">' + label + '</label><textarea id="' + id + '" name="' + c.k + '">' + esc(v) + "</textarea>" + ayuda + "</div>";
+      return '<div class="adm-field"><label for="' + id + '">' + label + '</label><textarea id="' + id + '" name="' + c.k + '"' +
+        (c.grande ? ' class="grande"' : "") + ">" + esc(v) + "</textarea>" + ayuda + "</div>";
+    }
+    if (c.tipo === "check") {
+      return '<div class="adm-field"><div class="adm-checks"><label><input type="checkbox" name="' + c.k + '"' + (v ? " checked" : "") + "> " +
+        esc(c.label) + "</label></div>" + ayuda + "</div>";
     }
     if (c.tipo === "lineas") {
       var sel = v || [];
+      var opciones = state.data.lineas.map(function (l) {
+        return '<label><input type="checkbox" name="' + c.k + '" value="' + esc(l.id) + '"' + (sel.indexOf(l.id) !== -1 ? " checked" : "") + "> " + esc(l.titulo_es) + "</label>";
+      }).join("");
       return '<div class="adm-field"><span class="adm-label">' + label + '</span><div class="adm-checks">' +
-        LINEAS.map(function (l) {
-          return '<label><input type="checkbox" name="' + c.k + '" value="' + l.id + '"' + (sel.indexOf(l.id) !== -1 ? " checked" : "") + "> " + esc(l.nombre_es) + "</label>";
-        }).join("") + "</div>" + ayuda + "</div>";
+        (opciones || "<small>Todavía no hay líneas cargadas.</small>") + "</div>" + ayuda + "</div>";
     }
     if (c.tipo === "imagen") {
       var cuadrada = c.cuadrada === false;
@@ -289,21 +405,44 @@
       (c.ph ? ' placeholder="' + esc(c.ph) + '"' : "") + ">" + ayuda + "</div>";
   }
 
-  function camposPlanos(campos) {
-    var out = [];
-    campos.forEach(function (c) { if (c.fila) out.push.apply(out, c.fila); else out.push(c); });
-    return out;
+  function camposHtml(campos, item) {
+    return campos.map(function (c) {
+      if (c.fila) return '<div class="adm-row">' + c.fila.map(function (f) { return campoHtml(f, item); }).join("") + "</div>";
+      return campoHtml(c, item);
+    }).join("");
   }
+
+  // Lee los valores del formulario; devuelve la lista de obligatorios vacíos
+  function leerCampos(form, campos, item) {
+    var faltan = [];
+    camposPlanos(campos).forEach(function (c) {
+      if (!c.k || !campoVisible(c, item)) return;
+      if (c.tipo === "lineas") {
+        item[c.k] = Array.prototype.slice.call(form.querySelectorAll('input[name="' + c.k + '"]:checked')).map(function (x) { return x.value; });
+        return;
+      }
+      var el = form.elements[c.k];
+      if (!el) return;
+      if (c.tipo === "check") { item[c.k] = el.checked; return; }
+      var val = String(el.value || "").trim();
+      if (c.tipo === "url" && val && /^(javascript|data|vbscript):/i.test(val)) val = "";
+      if (c.tipo === "url" && val && /^www\./i.test(val)) val = "https://" + val;
+      item[c.k] = val;
+      if (c.req && !val) faltan.push(c.label);
+    });
+    return faltan;
+  }
+
+  /* ---------- Editor (ventana con formulario) ---------- */
+  var edicion = null; // { tab, index, item }
 
   function abrirEditor(tab, index) {
     var sec = SECCIONES[tab];
     var item = index >= 0 ? clone(state.data[tab][index]) : { id: nuevoId() };
+    if (tab === "lineas" && index < 0) item.destacada = false;
     edicion = { tab: tab, index: index, item: item };
     $("#editor-titulo").textContent = (index >= 0 ? "Editar " : "Agregar ") + sec.singular;
-    $("#editor-campos").innerHTML = sec.campos.map(function (c) {
-      if (c.fila) return '<div class="adm-row">' + c.fila.map(function (f) { return campoHtml(f, item); }).join("") + "</div>";
-      return campoHtml(c, item);
-    }).join("");
+    $("#editor-campos").innerHTML = camposHtml(sec.campos, item);
     $("#editor-error").hidden = true;
 
     camposPlanos(sec.campos).filter(function (c) { return c.tipo === "imagen"; }).forEach(prepararImagen);
@@ -331,10 +470,12 @@
       if (!file) return;
       achicarImagen(file, c.max || 1200).then(function (dataUrl) {
         var form = $("#editor-form");
-        var base = (form.elements.nombre && form.elements.nombre.value) || (form.elements.texto_es && form.elements.texto_es.value) || file.name.replace(/\.[^.]+$/, "");
+        var el = form.elements.nombre || form.elements.titulo_es || form.elements.texto_es;
+        var base = (el && el.value) || file.name.replace(/\.[^.]+$/, "");
         var path = "assets/img/" + c.carpeta + "/" + slug(base) + "-" + Date.now().toString(36) + ".jpg";
         state.imagenes[path] = dataUrl;
         hidden.value = path;
+        edicion.item[c.k + "__pendiente"] = path; // para que no se descarte antes de guardar
         pintar();
       }).catch(function () {
         alert("No se pudo leer esa imagen. Probá con un JPG o PNG.");
@@ -367,29 +508,26 @@
     });
   }
 
+  function idLineaUnico(titulo, propio) {
+    var base = slug(titulo) || "linea", id = base, n = 2;
+    while (state.data.lineas.some(function (l) { return l.id === id && l !== propio; })) id = base + "-" + n++;
+    return id;
+  }
+
   function guardarEditor(ev) {
     ev.preventDefault();
     var sec = SECCIONES[edicion.tab];
     var form = $("#editor-form");
     var item = edicion.item;
-    var faltan = [];
-    camposPlanos(sec.campos).forEach(function (c) {
-      if (c.tipo === "lineas") {
-        item[c.k] = Array.prototype.slice.call(form.querySelectorAll('input[name="' + c.k + '"]:checked')).map(function (x) { return x.value; });
-        return;
-      }
-      var val = String(form.elements[c.k].value || "").trim();
-      if (c.tipo === "url" && val && /^(javascript|data|vbscript):/i.test(val)) val = "";
-      if (c.tipo === "url" && val && /^www\./i.test(val)) val = "https://" + val;
-      item[c.k] = val;
-      if (c.req && !val) faltan.push(c.label);
-    });
+    var faltan = leerCampos(form, sec.campos, item);
     if (faltan.length) {
       var err = $("#editor-error");
       err.textContent = "Falta completar: " + faltan.join(", ") + ".";
       err.hidden = false;
       return;
     }
+    Object.keys(item).forEach(function (k) { if (/__pendiente$/.test(k)) delete item[k]; });
+    if (edicion.tab === "lineas" && edicion.index < 0) item.id = idLineaUnico(item.titulo_es, item);
     if (edicion.index >= 0) state.data[edicion.tab][edicion.index] = item;
     else state.data[edicion.tab].push(item);
     $("#editor").close();
@@ -405,18 +543,19 @@
     actualizarEstado();
   }
 
-  /* ---------- Ajustes ---------- */
-  function renderAjustes() {
-    var a = state.data.ajustes;
-    $("#panel").innerHTML = '<div class="adm-card"><div class="adm-toolbar"><h2>Ajustes</h2></div>' +
-      '<p class="adm-help">Datos generales del sitio.</p>' +
-      '<div class="adm-field"><label for="aj-email">Email de contacto</label>' +
-      '<input type="text" id="aj-email" value="' + esc(a.email) + '" placeholder="laboratorio@itba.edu.ar"></div>' +
-      '<div class="adm-field"><div class="adm-checks"><label><input type="checkbox" id="aj-avisos"' + (a.mostrarAvisosEjemplo ? " checked" : "") + "> " +
-      "Mostrar los recuadros amarillos de “Contenido de ejemplo”</label></div>" +
-      "<small>Desmarcalo cuando hayas reemplazado el contenido de ejemplo por el real.</small></div></div>";
-    $("#aj-email").addEventListener("input", function (e) { a.email = e.target.value.trim(); guardarBorrador(); });
-    $("#aj-avisos").addEventListener("change", function (e) { a.mostrarAvisosEjemplo = e.target.checked; guardarBorrador(); });
+  /* ---------- Contacto y Ajustes ---------- */
+  function renderObjeto(tab) {
+    var o = OBJETOS[tab];
+    var obj = state.data[tab];
+    $("#panel").innerHTML = '<form class="adm-card" id="obj-form" onsubmit="return false">' +
+      '<div class="adm-toolbar"><h2>' + esc(o.titulo) + "</h2></div>" +
+      '<p class="adm-help">' + esc(o.ayuda) + (o.donde ? " " + dondeHtml(o.donde) : "") + "</p>" +
+      camposHtml(o.campos, obj) +
+      '<p class="adm-help">Los cambios se guardan solos como borrador. Tocá “Publicar” para que se vean en el sitio.</p></form>';
+    var form = $("#obj-form");
+    function guardar() { leerCampos(form, o.campos, obj); guardarBorrador(); }
+    form.addEventListener("input", guardar);
+    form.addEventListener("change", guardar);
   }
 
   /* ---------- GitHub ---------- */
@@ -663,6 +802,7 @@
       b.addEventListener("click", function () { aviso(); mostrarTab(b.getAttribute("data-tab")); });
     });
     $("#panel").addEventListener("click", function (ev) {
+      if (ev.target.closest("[data-ver]")) { guardarBorrador(); return; } // el link abre la vista previa
       var b = ev.target.closest("[data-accion]");
       if (b) accionLista(b.getAttribute("data-accion"), Number(b.getAttribute("data-i")));
     });
@@ -686,11 +826,11 @@
     });
 
     var inicial = (location.hash || "").slice(1);
-    var validas = Object.keys(SECCIONES).concat(["ajustes", "publicacion"]);
-    mostrarTab(validas.indexOf(inicial) !== -1 ? inicial : "personas");
+    var validas = Object.keys(SECCIONES).concat(Object.keys(OBJETOS), ["publicacion"]);
+    mostrarTab(validas.indexOf(inicial) !== -1 ? inicial : "lineas");
   }
 
-  if (!window.SITE_DATA) {
+  if (!window.SITE_DATA || !normalizar) {
     document.addEventListener("DOMContentLoaded", function () {
       document.getElementById("panel").innerHTML = '<div class="adm-alert error">No se pudo cargar <code>data/contenido.js</code>.</div>';
     });

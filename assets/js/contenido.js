@@ -1,23 +1,71 @@
 /* Laboratorio de Navegación & Neurocognición — contenido editable
-   Dibuja personas, publicaciones, subsidios, noticias, galería y contacto
+   Dibuja líneas, personas, publicaciones, subsidios, noticias, galería y contacto
    a partir de data/contenido.js (que se edita desde admin.html).
 
-   En el HTML, cada bloque se marca con data-render="<sección>".
+   En el HTML, cada bloque se marca con data-render="<bloque>".
    Lo que está escrito dentro del bloque solo se ve si los datos no cargan. */
 (function () {
   "use strict";
 
-  var LINEAS = [
-    { id: "ultrasonidos", pagina: "linea-ultrasonidos.html", corto_es: "Ultrasonidos", corto_en: "Ultrasonics",
-      nombre_es: "Vocalizaciones ultrasónicas y dinámica de la memoria", nombre_en: "Ultrasonic Vocalizations and Memory Dynamics" },
-    { id: "desorientacion", pagina: "linea-desorientacion.html", corto_es: "Desorientación", corto_en: "Disorientation",
-      nombre_es: "Desorientación espacial e integración de trayectoria", nombre_en: "Spatial Disorientation and Path Integration" },
-    { id: "navegacion", pagina: "linea-navegacion.html", corto_es: "Navegación", corto_en: "Navigation",
-      nombre_es: "Ecología del movimiento y eficiencia de navegación", nombre_en: "Movement Ecology and Navigation Efficiency" }
-  ];
-
   var DRAFT_KEY = "nn-admin-borrador";
 
+  /* ---------- Valores por defecto (si data/contenido.js no los trae) ---------- */
+  var DEFAULT_LINEAS = [
+    { id: "ultrasonidos", pagina: "linea-ultrasonidos.html", destacada: true,
+      titulo_es: "Vocalizaciones ultrasónicas y dinámica de la memoria", titulo_en: "Ultrasonic Vocalizations and Memory Dynamics",
+      corto_es: "Ultrasonidos", corto_en: "Ultrasonics",
+      resumen_es: "Las ratas se comunican con sonidos por encima de lo que el oído humano puede percibir. Estudiamos qué nos dicen esas vocalizaciones sobre cómo se forman, se evocan y se transforman las memorias.",
+      resumen_en: "Rats communicate with sounds above the range of human hearing. We study what these vocalizations reveal about how memories are formed, retrieved, and transformed.",
+      imagen: "assets/img/linea-ultrasonidos.jpg", descripcion_es: "", descripcion_en: "" },
+    { id: "desorientacion", pagina: "linea-desorientacion.html", destacada: true,
+      titulo_es: "Desorientación espacial e integración de trayectoria", titulo_en: "Spatial Disorientation and Path Integration",
+      corto_es: "Desorientación", corto_en: "Disorientation",
+      resumen_es: "Cómo el cerebro estima la propia posición a partir del movimiento y qué ocurre cuando esas señales internas entran en conflicto, como en el vuelo.",
+      resumen_en: "How the brain estimates its own position from self-motion, and what happens when those internal signals conflict, as in flight.",
+      imagen: "assets/img/linea-desorientacion.jpg", descripcion_es: "", descripcion_en: "" },
+    { id: "navegacion", pagina: "linea-navegacion.html", destacada: true,
+      titulo_es: "Ecología del movimiento y eficiencia de navegación", titulo_en: "Movement Ecology and Navigation Efficiency",
+      corto_es: "Navegación", corto_en: "Navigation",
+      resumen_es: "Trayectorias, decisiones y estrategias: cómo los animales exploran y aprenden a moverse de forma eficiente en entornos complejos.",
+      resumen_en: "Trajectories, decisions, and strategies: how animals explore and learn to move efficiently through complex environments.",
+      imagen: "assets/img/linea-navegacion.jpg", descripcion_es: "", descripcion_en: "" }
+  ];
+
+  var DEFAULT_CONTACTO = {
+    email: "",
+    departamento_es: "Departamento de Investigación y Doctorado",
+    departamento_en: "Research and Doctorate Department",
+    institucion_es: "Instituto Tecnológico de Buenos Aires (ITBA)",
+    institucion_en: "Buenos Aires Institute of Technology (ITBA)",
+    calle: "Iguazú 341",
+    codigoPostal: "(1437)",
+    ciudad_es: "Ciudad de Buenos Aires, Argentina",
+    ciudad_en: "Buenos Aires, Argentina",
+    mapa: "Iguazú 341, Buenos Aires, Argentina",
+    cursosUrl: "https://investigacion.itba.edu.ar/cursos-de-doctorado/"
+  };
+
+  var LISTAS = ["lineas", "personas", "publicaciones", "subsidios", "noticias", "galeria"];
+
+  // Completa lo que falte y adapta datos guardados con versiones anteriores del panel
+  function normalizar(d) {
+    d = d ? JSON.parse(JSON.stringify(d)) : {};
+    d.ajustes = d.ajustes || {};
+    if (d.ajustes.mostrarAvisosEjemplo === undefined) d.ajustes.mostrarAvisosEjemplo = true;
+    if (!d.contacto) {
+      d.contacto = JSON.parse(JSON.stringify(DEFAULT_CONTACTO));
+      d.contacto.email = d.ajustes.email || "";
+    }
+    delete d.ajustes.email;
+    Object.keys(DEFAULT_CONTACTO).forEach(function (k) {
+      if (d.contacto[k] === undefined) d.contacto[k] = DEFAULT_CONTACTO[k];
+    });
+    if (!Array.isArray(d.lineas)) d.lineas = JSON.parse(JSON.stringify(DEFAULT_LINEAS));
+    LISTAS.forEach(function (k) { if (!Array.isArray(d[k])) d[k] = []; });
+    return d;
+  }
+
+  /* ---------- Utilidades ---------- */
   function esc(s) {
     return String(s == null ? "" : s)
       .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
@@ -29,7 +77,7 @@
     u = String(u || "").trim();
     if (!u) return "";
     if (/^(https?:|mailto:)/i.test(u)) return u;
-    if (/^[a-z][a-z0-9+.-]*:/i.test(u)) return ""; // javascript:, data:, etc.
+    if (/^[a-z][a-z0-9+.-]*:/i.test(u)) return "";
     return u;
   }
 
@@ -41,13 +89,10 @@
     return '<span lang="es">' + esc(es) + '</span><span lang="en">' + esc(en) + "</span>";
   }
 
-  function lineaById(id) {
-    for (var i = 0; i < LINEAS.length; i++) if (LINEAS[i].id === id) return LINEAS[i];
-    return null;
-  }
-
-  function enLinea(item, linea) {
-    return !linea || (item.lineas || []).indexOf(linea) !== -1;
+  // Párrafos separados por una línea en blanco
+  function parrafos(es, en) {
+    var a = String(es || "").split(/\n\s*\n/), b = String(en || es || "").split(/\n\s*\n/);
+    return a.map(function (p, i) { return "<p>" + bi(p.trim(), (b[i] || p).trim()) + "</p>"; }).join("");
   }
 
   function initials(nombre) {
@@ -56,11 +101,17 @@
     return (parts[0][0] + (parts.length > 1 ? parts[parts.length - 1][0] : "")).toUpperCase();
   }
 
-  function vacio(es, en) {
-    return '<p class="empty-note">' + bi(es, en) + "</p>";
+  function lineaUrl(l) { return l.pagina || "linea.html?id=" + encodeURIComponent(l.id); }
+
+  function vacio(es, en) { return '<p class="empty-note">' + bi(es, en) + "</p>"; }
+
+  function boton(href, es, en) {
+    return '<a class="btn" href="' + esc(href) + '">' + bi(es, en) + "</a>";
   }
 
-  /* ---------- Vista previa del borrador (desde admin.html) ---------- */
+  /* ---------- Datos (o borrador, en vista previa) ---------- */
+  var ctx = { data: null, imagenes: {}, preview: false };
+
   function cargarDatos() {
     var data = window.SITE_DATA || null;
     var imagenes = {};
@@ -71,22 +122,108 @@
         if (b && b.data) { data = b.data; imagenes = b.imagenes || {}; }
       } catch (e) { /* sin borrador */ }
     }
-    return { data: data, imagenes: imagenes, preview: preview };
+    return { data: data ? normalizar(data) : null, imagenes: imagenes, preview: preview };
   }
-
-  var ctx = null;
 
   function img(path) {
     if (!path) return "";
-    if (ctx && ctx.imagenes[path]) return ctx.imagenes[path]; // imagen nueva aún no publicada
+    if (ctx.imagenes[path]) return ctx.imagenes[path]; // imagen nueva aún no publicada
     return safeUrl(path);
   }
 
-  /* ---------- Secciones ---------- */
+  function lineaById(d, id) {
+    for (var i = 0; i < d.lineas.length; i++) if (d.lineas[i].id === id) return d.lineas[i];
+    return null;
+  }
+
+  function enLinea(item, linea) { return !linea || (item.lineas || []).indexOf(linea) !== -1; }
+
+  function idLineaUrl() {
+    var m = location.search.match(/[?&]id=([^&#]+)/);
+    return m ? decodeURIComponent(m[1]) : "";
+  }
+
+  function limite(el) {
+    var n = parseInt(el.getAttribute("data-limite"), 10);
+    return n > 0 ? n : Infinity;
+  }
+
+  /* ---------- Piezas ---------- */
+  function tarjetaLinea(l) {
+    var foto = img(l.imagen);
+    return '<a class="line-card" id="linea-' + esc(l.id) + '" href="' + esc(lineaUrl(l)) + '">' +
+      '<div class="thumb">' + (foto ? '<img src="' + esc(foto) + '" alt="" loading="lazy">' : "") + "</div>" +
+      '<div class="body"><h3>' + bi(l.titulo_es, l.titulo_en) + "</h3>" +
+      "<p>" + bi(l.resumen_es, l.resumen_en) + "</p>" +
+      '<span class="more">' + bi("Ver proyecto →", "View project →") + "</span></div></a>";
+  }
+
+  function noticia(n) {
+    var url = safeUrl(n.enlace);
+    var mas = url
+      ? ' <a href="' + esc(url) + '"' + (isExternal(url) ? ' target="_blank" rel="noopener"' : "") + ">" +
+        bi("Más información", "Learn more") + "</a>"
+      : "";
+    return '<article class="news-item" id="noticia-' + esc(n.id) + '">' +
+      '<time datetime="' + esc(n.fecha) + '">' + esc(n.fecha) + "</time>" +
+      "<h3>" + bi(n.titulo_es, n.titulo_en) + "</h3>" +
+      "<p>" + bi(n.texto_es, n.texto_en) + mas + "</p>" +
+      "</article>";
+  }
+
+  function lineaActual(d, el) {
+    var id = el.getAttribute("data-linea");
+    return id ? lineaById(d, id) : null;
+  }
+
+  /* ---------- Bloques ---------- */
   var render = {
+    /* Líneas de investigación */
+    "lineas-destacadas": function (d) {
+      var lista = d.lineas.filter(function (l) { return l.destacada; });
+      if (!lista.length) return vacio("Próximamente.", "Coming soon.");
+      return lista.map(tarjetaLinea).join("");
+    },
+    "lineas-todas": function (d) {
+      if (!d.lineas.length) return vacio("Próximamente.", "Coming soon.");
+      return d.lineas.map(tarjetaLinea).join("");
+    },
+    "lineas-mas": function (d) {
+      var dest = d.lineas.filter(function (l) { return l.destacada; }).length;
+      return d.lineas.length > dest ? boton("lineas.html", "Ver todas las líneas", "See all research lines") : "";
+    },
+    "lineas-footer": function (d) {
+      var lista = d.lineas.filter(function (l) { return l.destacada; });
+      var html = lista.map(function (l) {
+        return '<li><a href="' + esc(lineaUrl(l)) + '">' + bi(l.corto_es || l.titulo_es, l.corto_en || l.titulo_en) + "</a></li>";
+      }).join("");
+      if (d.lineas.length > lista.length) html += '<li><a href="lineas.html">' + bi("Todas las líneas", "All research lines") + "</a></li>";
+      return html;
+    },
+
+    /* Página genérica de una línea (linea.html?id=...) */
+    "linea-hero": function (d, el) {
+      var l = lineaActual(d, el);
+      if (!l) return "<h1>" + bi("Línea no encontrada", "Research line not found") + "</h1>";
+      var root = document.documentElement;
+      root.setAttribute("data-title-es", l.titulo_es + " | Laboratorio de Navegación & Neurocognición");
+      root.setAttribute("data-title-en", (l.titulo_en || l.titulo_es) + " | Navigation & Neurocognition Laboratory");
+      document.title = root.getAttribute("data-title-" + (root.getAttribute("data-lang") === "en" ? "en" : "es"));
+      return "<h1>" + bi(l.titulo_es, l.titulo_en) + "</h1><p>" + bi(l.resumen_es, l.resumen_en) + "</p>";
+    },
+    "linea-cuerpo": function (d, el) {
+      var l = lineaActual(d, el);
+      if (!l) return '<p><a href="lineas.html">' + bi("Ver todas las líneas", "See all research lines") + "</a></p>";
+      var foto = img(l.imagen);
+      var texto = l.descripcion_es ? parrafos(l.descripcion_es, l.descripcion_en) : "<p>" + bi(l.resumen_es, l.resumen_en) + "</p>";
+      return '<div class="split"><div class="prose"><h2>' + bi("Sobre el proyecto", "About the project") + "</h2>" + texto + "</div>" +
+        (foto ? '<img src="' + esc(foto) + '" alt="">' : "") + "</div>";
+    },
+
+    /* Personas */
     personas: function (d, el) {
       var linea = el.getAttribute("data-linea");
-      var lista = (d.personas || []).filter(function (p) { return enLinea(p, linea); });
+      var lista = d.personas.filter(function (p) { return enLinea(p, linea); });
       if (!lista.length) return vacio("Próximamente.", "Coming soon.");
       return lista.map(function (p) {
         var foto = img(p.foto);
@@ -98,11 +235,11 @@
         if (li) links.push('<a href="' + esc(li) + '" target="_blank" rel="noopener">LinkedIn</a>');
         if (!linea) {
           (p.lineas || []).forEach(function (id) {
-            var l = lineaById(id);
-            if (l) links.push('<a href="' + l.pagina + '">' + bi(l.corto_es, l.corto_en) + "</a>");
+            var l = lineaById(d, id);
+            if (l) links.push('<a href="' + esc(lineaUrl(l)) + '">' + bi(l.corto_es || l.titulo_es, l.corto_en || l.titulo_en) + "</a>");
           });
         }
-        return '<article class="person">' +
+        return '<article class="person" id="persona-' + esc(p.id) + '">' +
           '<div class="avatar">' + avatar + "</div>" +
           "<h3>" + esc(p.nombre) + "</h3>" +
           '<div class="role">' + bi(p.rol_es, p.rol_en) + "</div>" +
@@ -111,16 +248,17 @@
       }).join("");
     },
 
+    /* Publicaciones */
     publicaciones: function (d, el) {
       var linea = el.getAttribute("data-linea");
-      var lista = (d.publicaciones || []).filter(function (p) { return enLinea(p, linea); });
+      var lista = d.publicaciones.filter(function (p) { return enLinea(p, linea); });
       lista.sort(function (a, b) { return String(b.anio).localeCompare(String(a.anio)); });
       if (!lista.length) return '<li class="empty">' + bi("Próximamente.", "Coming soon.") + "</li>";
       return lista.map(function (p) {
         var url = safeUrl(p.url);
         var titulo = esc(p.titulo);
         if (url) titulo = '<a href="' + esc(url) + '" target="_blank" rel="noopener">' + titulo + "</a>";
-        return "<li>" +
+        return '<li id="pub-' + esc(p.id) + '">' +
           '<span class="pub-year">' + esc(p.anio) + "</span> " +
           '<span class="pub-authors">' + esc(p.autores) + "</span> " +
           '<span class="pub-title">' + titulo + "</span> " +
@@ -129,11 +267,11 @@
       }).join("");
     },
 
+    /* Subsidios */
     subsidios: function (d) {
-      var lista = d.subsidios || [];
-      if (!lista.length) return '<li class="empty">' + bi("Próximamente.", "Coming soon.") + "</li>";
-      return lista.map(function (s) {
-        return "<li>" +
+      if (!d.subsidios.length) return '<li class="empty">' + bi("Próximamente.", "Coming soon.") + "</li>";
+      return d.subsidios.map(function (s) {
+        return '<li id="subsidio-' + esc(s.id) + '">' +
           '<div class="grant-period">' + esc(s.periodo) + "</div>" +
           "<div>" +
           '<div class="grant-funder">' + esc(s.entidad) + "</div>" +
@@ -143,55 +281,104 @@
       }).join("");
     },
 
-    noticias: function (d) {
-      var lista = d.noticias || [];
+    /* Noticias (data-limite="1" en la portada) */
+    noticias: function (d, el) {
+      var lista = d.noticias.slice(0, limite(el));
       if (!lista.length) return vacio("No hay noticias por ahora.", "No news yet.");
-      return lista.map(function (n) {
-        var url = safeUrl(n.enlace);
-        var mas = url
-          ? ' <a href="' + esc(url) + '"' + (isExternal(url) ? ' target="_blank" rel="noopener"' : "") + ">" +
-            bi("Más información", "Learn more") + "</a>"
-          : "";
-        return '<article class="news-item">' +
-          '<time datetime="' + esc(n.fecha) + '">' + esc(n.fecha) + "</time>" +
-          "<h3>" + bi(n.titulo_es, n.titulo_en) + "</h3>" +
-          "<p>" + bi(n.texto_es, n.texto_en) + mas + "</p>" +
-          "</article>";
-      }).join("");
+      return lista.map(noticia).join("");
+    },
+    "noticias-mas": function (d) {
+      return d.noticias.length > 1 ? boton("noticias.html", "Ver todas las noticias", "See all news") : "";
     },
 
+    /* Vida del lab */
     galeria: function (d) {
-      var lista = d.galeria || [];
-      if (!lista.length) return vacio("Próximamente.", "Coming soon.");
-      return lista.map(function (g) {
+      if (!d.galeria.length) return vacio("Próximamente.", "Coming soon.");
+      return d.galeria.map(function (g) {
         var foto = img(g.foto);
-        if (!foto) return '<div class="ph">' + bi(g.texto_es, g.texto_en) + "</div>";
-        return '<figure class="photo">' +
+        if (!foto) return '<div class="ph" id="foto-' + esc(g.id) + '">' + bi(g.texto_es, g.texto_en) + "</div>";
+        return '<figure class="photo" id="foto-' + esc(g.id) + '">' +
           '<img src="' + esc(foto) + '" alt="' + esc(g.texto_es) + '" loading="lazy">' +
           (g.texto_es ? "<figcaption>" + bi(g.texto_es, g.texto_en) + "</figcaption>" : "") +
           "</figure>";
       }).join("");
     },
 
-    email: function (d) {
-      var email = (d.ajustes && d.ajustes.email) || "";
-      if (!email) return bi("(a completar)", "(to be completed)");
-      return '<a href="mailto:' + esc(email) + '">' + esc(email) + "</a>";
+    /* Contacto */
+    contacto: function (d) {
+      var c = d.contacto;
+      var email = c.email
+        ? '<a href="mailto:' + esc(c.email) + '">' + esc(c.email) + "</a>"
+        : bi("(a completar)", "(to be completed)");
+      var cursos = safeUrl(c.cursosUrl);
+      var host = cursos.replace(/^https?:\/\//i, "").split("/")[0];
+      return "<dt>" + bi("Dirección", "Address") + "</dt>" +
+        "<dd>" + direccionHtml(c, ", ") + "</dd>" +
+        "<dt>Email</dt><dd>" + email + "</dd>" +
+        (cursos ? "<dt>" + bi("Cursos de doctorado", "Doctoral courses") + '</dt><dd><a href="' + esc(cursos) + '" target="_blank" rel="noopener">' + esc(host) + "</a></dd>" : "");
+    },
+    direccion: function (d) { return direccionHtml(d.contacto, "<br>"); },
+    mapa: function (d, el) {
+      var c = d.contacto;
+      var q = c.mapa || [c.calle, c.ciudad_es].filter(Boolean).join(", ");
+      el.hidden = !q;
+      if (q) {
+        var src = "https://www.google.com/maps?q=" + encodeURIComponent(q) + "&output=embed";
+        if (el.getAttribute("src") !== src) el.setAttribute("src", src);
+        el.setAttribute("title", "Mapa: " + q);
+      }
+      return null;
+    },
+    "cursos-link": function (d, el) {
+      var u = safeUrl(d.contacto.cursosUrl);
+      el.closest("li") ? (el.closest("li").hidden = !u) : (el.hidden = !u);
+      if (u) el.setAttribute("href", u);
+      return null;
     }
   };
+
+  function direccionHtml(c, sep) {
+    var lineas = [];
+    if (c.departamento_es) lineas.push(bi(c.departamento_es, c.departamento_en));
+    if (c.institucion_es) lineas.push(bi(c.institucion_es, c.institucion_en));
+    var calle = esc(c.calle || "");
+    var ciudad = [c.codigoPostal ? esc(c.codigoPostal) : "", c.ciudad_es ? bi(c.ciudad_es, c.ciudad_en) : ""]
+      .filter(Boolean).join(" ");
+    if (sep === "<br>") {
+      if (calle) lineas.push(calle);
+      if (ciudad) lineas.push(ciudad);
+      return lineas.join("<br>");
+    }
+    var ult = [calle, ciudad].filter(Boolean).join(", ");
+    if (ult) lineas.push(ult);
+    return lineas.join("<br>");
+  }
+
+  /* ---------- Vista previa: mantenerla al navegar por el sitio ---------- */
+  function conPreview(href) {
+    var m = href.match(/^([a-z0-9-]+\.html)(\?[^#]*)?(#.*)?$/i);
+    if (!m || m[1] === "admin.html") return null;
+    var q = m[2] ? m[2] + "&vista-previa" : "?vista-previa";
+    return m[1] + q + (m[3] || "");
+  }
 
   function aplicar() {
     ctx = cargarDatos();
     var d = ctx.data;
     if (!d) return; // sin datos: queda el contenido escrito en el HTML
 
+    var idUrl = idLineaUrl();
+    document.querySelectorAll('[data-linea="@url"]').forEach(function (el) { el.setAttribute("data-linea", idUrl); });
+
     document.querySelectorAll("[data-render]").forEach(function (el) {
       var fn = render[el.getAttribute("data-render")];
-      if (fn) el.innerHTML = fn(d, el);
+      if (!fn) return;
+      var html = fn(d, el);
+      if (html !== null && html !== undefined) el.innerHTML = html;
     });
 
     // Recuadros amarillos de "contenido de ejemplo"
-    var avisos = !d.ajustes || d.ajustes.mostrarAvisosEjemplo !== false;
+    var avisos = d.ajustes.mostrarAvisosEjemplo !== false;
     document.querySelectorAll("[data-aviso]").forEach(function (el) { el.hidden = !avisos; });
 
     if (ctx.preview) {
@@ -199,18 +386,24 @@
       bar.className = "preview-bar";
       bar.innerHTML = "Vista previa del borrador · todavía no está publicado · <a href=\"admin.html\">Volver al panel</a>";
       document.body.insertBefore(bar, document.body.firstChild);
-      // Mantener la vista previa al navegar entre páginas del sitio
       document.querySelectorAll("a[href]").forEach(function (a) {
-        var h = a.getAttribute("href");
-        if (/^[a-z0-9-]+\.html(#.*)?$/i.test(h) && h.indexOf("admin.html") !== 0) {
-          var parts = h.split("#");
-          a.setAttribute("href", parts[0] + "?vista-previa" + (parts[1] ? "#" + parts[1] : ""));
-        }
+        var nuevo = conPreview(a.getAttribute("href"));
+        if (nuevo) a.setAttribute("href", nuevo);
       });
+    }
+
+    // Si se llegó con #algo (por ejemplo desde el panel), ir hasta ese elemento y resaltarlo
+    if (location.hash.length > 1) {
+      var target = document.getElementById(decodeURIComponent(location.hash.slice(1)));
+      if (target) {
+        target.classList.add("is-target");
+        setTimeout(function () { target.scrollIntoView({ block: "center" }); }, 60);
+      }
     }
   }
 
-  window.SITE_LINEAS = LINEAS;
+  window.SITE_NORMALIZAR = normalizar;
+  window.SITE_LINEA_URL = lineaUrl;
   window.SITE_DRAFT_KEY = DRAFT_KEY;
 
   document.addEventListener("DOMContentLoaded", aplicar);
