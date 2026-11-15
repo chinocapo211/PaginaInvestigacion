@@ -34,6 +34,7 @@
 
 <div class="container adm-layout">
   <nav class="adm-tabs" id="tabs" aria-label="Secciones">
+    <button type="button" data-tab="marcos">Marco conceptual</button>
     <button type="button" data-tab="lineas">Líneas de investigación</button>
     <button type="button" data-tab="personas">Personas</button>
     <button type="button" data-tab="noticias">Noticias</button>
@@ -46,6 +47,11 @@
   </nav>
 
   <main class="adm-main">
+    <div id="nota-local" class="adm-alert" hidden>
+      <strong>Modo demostración: los cambios son solo locales.</strong>
+      Lo que modifiques acá se guarda únicamente en este navegador, a modo de muestra: el sitio lo muestra solo en esta
+      computadora (tocá “Ver sitio”) y nadie más lo ve. No se publica nada.
+    </div>
     <div id="nota-borrador" class="adm-alert warn" hidden>
       <strong>Tus cambios están guardados como borrador en este navegador, pero todavía no se ven en el sitio.</strong>
       Para revisarlos usá “Vista previa”; para que los vea todo el mundo, tocá “Publicar”.

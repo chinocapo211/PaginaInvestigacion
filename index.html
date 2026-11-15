@@ -114,6 +114,7 @@
   <!-- ===== Marco conceptual ===== -->
   <section class="section" id="marco">
     <div class="container">
+      <div data-render="marcos-destacados">
       <div class="section-head">
         <span class="eyebrow"><span lang="es">Marco conceptual</span><span lang="en">Conceptual framework</span></span>
         <h2><span lang="es">La información como código dinámico</span><span lang="en">Information as a dynamic code</span></h2>
@@ -123,7 +124,7 @@
           <span lang="es">La información en los seres vivos es un código dinámico que emerge de las interacciones dentro de los sistemas biológicos y entre estos y su entorno. Se transforma continuamente a través de la actividad, modificando así las condiciones para la acción posterior.</span>
           <span lang="en">Information in living beings is a dynamic code that emerges from interactions within and between biological systems and their environment. It continuously transforms through activity, thereby modifying the conditions for subsequent action.</span>
         </blockquote>
-        <a class="ribio-card" href="ribio.html">
+        <a class="ribio-card" href="marco.html?id=ribio">
           <img src="assets/img/ribio-logo.png" alt="RIBio – Redes de Información Biológica">
           <p>
             <span lang="es">RIBio: curso de doctorado gratuito en ITBA que desarrolla este marco conceptual.</span>
@@ -132,6 +133,8 @@
           <span class="more"><span lang="es">Conocé el curso →</span><span lang="en">Learn about the course →</span></span>
         </a>
       </div>
+      </div>
+      <div class="section-more" data-render="marcos-mas"></div>
     </div>
   </section>
 
@@ -188,10 +191,6 @@
         <span class="eyebrow"><span lang="es">Equipo</span><span lang="en">Team</span></span>
         <h2><span lang="es">Personas</span><span lang="en">People</span></h2>
       </div>
-      <p class="placeholder-note" data-aviso>
-        <span lang="es">Contenido de ejemplo: reemplazar con foto, nombre, rol, red profesional y línea de investigación de cada integrante.</span>
-        <span lang="en">Sample content: replace with each member's photo, name, role, professional profile, and research line.</span>
-      </p>
       <!-- Para agregar a alguien: copiar un bloque <article class="person">, poner la foto en assets/img/personas/ y reemplazar el contenido del avatar por <img src="..." alt="..."> -->
       <div class="people" data-render="personas">
         <article class="person">
@@ -241,10 +240,6 @@
         <span class="eyebrow"><span lang="es">Producción científica</span><span lang="en">Scientific output</span></span>
         <h2><span lang="es">Publicaciones</span><span lang="en">Publications</span></h2>
       </div>
-      <p class="placeholder-note" data-aviso>
-        <span lang="es">Contenido de ejemplo: reemplazar con las publicaciones del laboratorio.</span>
-        <span lang="en">Sample content: replace with the lab's publications.</span>
-      </p>
       <ul class="pub-list" data-render="publicaciones">
         <li>
           <span class="pub-year">2026</span>
@@ -269,10 +264,6 @@
         <span class="eyebrow"><span lang="es">Financiamiento</span><span lang="en">Funding</span></span>
         <h2><span lang="es">Subsidios</span><span lang="en">Funding</span></h2>
       </div>
-      <p class="placeholder-note" data-aviso>
-        <span lang="es">Contenido de ejemplo: reemplazar con los subsidios del laboratorio (entidad, código, título, período y responsable).</span>
-        <span lang="en">Sample content: replace with the lab's grants (funder, code, title, period, and principal investigator).</span>
-      </p>
       <!-- Para agregar un subsidio: copiar un bloque <li> completo -->
       <ul class="grant-list" data-render="subsidios">
         <li>
@@ -307,8 +298,8 @@
           <time datetime="2026">2026</time>
           <h3><span lang="es">Abre la inscripción a RIBio</span><span lang="en">RIBio enrollment is open</span></h3>
           <p>
-            <span lang="es">Curso de doctorado gratuito sobre redes de información biológica en ITBA. <a href="ribio.html">Más información</a>.</span>
-            <span lang="en">Free doctoral course on biological information networks at ITBA. <a href="ribio.html">Learn more</a>.</span>
+            <span lang="es">Curso de doctorado gratuito sobre redes de información biológica en ITBA. <a href="marco.html?id=ribio">Más información</a>.</span>
+            <span lang="en">Free doctoral course on biological information networks at ITBA. <a href="marco.html?id=ribio">Learn more</a>.</span>
           </p>
         </article>
         <article class="news-item">
@@ -388,8 +379,10 @@
       </div>
       <div>
         <h4><span lang="es">Formación</span><span lang="en">Training</span></h4>
+        <ul data-render="marcos-footer">
+          <li><a href="marco.html?id=ribio">RIBio</a></li>
+        </ul>
         <ul>
-          <li><a href="ribio.html">RIBio</a></li>
           <li><a data-render="cursos-link" href="https://investigacion.itba.edu.ar/cursos-de-doctorado/" target="_blank" rel="noopener"><span lang="es">Cursos de doctorado ITBA</span><span lang="en">ITBA doctoral courses</span></a></li>
         </ul>
       </div>

@@ -15,6 +15,73 @@ window.SITE_DATA = {
     "mapa": "Iguazú 341, Buenos Aires, Argentina",
     "cursosUrl": "https://investigacion.itba.edu.ar/cursos-de-doctorado/"
   },
+  "marcos": [
+    {
+      "id": "ribio",
+      "destacada": true,
+      "nombre_es": "RIBio · Marco conceptual",
+      "nombre_en": "RIBio · Conceptual Framework",
+      "bajada_es": "Redes de Información Biológica · Curso de doctorado · ITBA",
+      "bajada_en": "Biological Information Networks · Doctoral course · ITBA",
+      "titulo_es": "La información como código dinámico",
+      "titulo_en": "Information as a dynamic code",
+      "cita_es": "La información en los seres vivos es un código dinámico que emerge de las interacciones dentro de los sistemas biológicos y entre estos y su entorno. Se transforma continuamente a través de la actividad, modificando así las condiciones para la acción posterior.",
+      "cita_en": "Information in living beings is a dynamic code that emerges from interactions within and between biological systems and their environment. It continuously transforms through activity, thereby modifying the conditions for subsequent action.",
+      "imagen": "assets/img/ribio-logo.png",
+      "tarjeta_es": "RIBio: curso de doctorado gratuito en ITBA que desarrolla este marco conceptual.",
+      "tarjeta_en": "RIBio: a free doctoral course at ITBA built on this conceptual framework.",
+      "boton_es": "Conocé el curso →",
+      "boton_en": "Learn about the course →",
+      "contenido": [
+        {
+          "tipo": "imagenTexto",
+          "src": "assets/img/ribio-logo.png",
+          "titulo_es": "",
+          "titulo_en": "",
+          "texto_es": "RIBio es un curso gratuito dirigido a estudiantes de doctorado de universidades públicas y privadas, que se dicta en ITBA.\n\nEs una propuesta innovadora inspirada en la perspectiva inside-out (“de adentro hacia afuera”) desarrollada por el Dr. György Buzsáki. El curso va más allá de preguntarse cómo la experiencia modula los circuitos neuronales, para preguntarse también cómo la actividad previa de esos circuitos predispone al organismo a la experiencia futura.",
+          "texto_en": "RIBio is a free doctoral course for PhD students from public and private universities, offered at ITBA.\n\nIt is a highly innovative course inspired by the inside-out perspective developed by Dr. György Buzsáki. The course goes beyond asking how experience modulates neural circuits, and instead asks how the prior activity of these circuits also predisposes the organism to future experience.",
+          "resaltado_es": "",
+          "resaltado_en": ""
+        },
+        {
+          "tipo": "boton",
+          "texto_es": "Cursos de doctorado en ITBA",
+          "texto_en": "ITBA doctoral courses",
+          "url": "https://investigacion.itba.edu.ar/cursos-de-doctorado/"
+        },
+        {
+          "tipo": "imagenTexto",
+          "src": "assets/img/ribio-informacion.jpg",
+          "titulo_es": "Información biológica",
+          "titulo_en": "Biological information",
+          "texto_es": "RIBio propone una mirada que va más allá de las neuronas, los organismos o la inteligencia artificial, para comprender la información como una propiedad emergente de sistemas biológicos que actúan, exploran e interactúan con su entorno.",
+          "texto_en": "RIBio proposes a perspective that goes beyond neurons, organisms, and artificial intelligence to understand information as an emergent property of biological systems that act, explore, and interact with their environment.",
+          "resaltado_es": "Una de las preguntas de base es: ¿qué ocurre cuando dejamos de pensar al cerebro como un receptor y comenzamos a verlo como un sistema que genera actividad?",
+          "resaltado_en": "One of its foundational questions is: what happens when we stop thinking of the brain as a receiver and begin to see it as a system that generates activity?"
+        },
+        {
+          "tipo": "imagenTexto",
+          "src": "assets/img/ribio-dejavu.jpg",
+          "titulo_es": "Déjà vu",
+          "titulo_en": "Déjà vu",
+          "texto_es": "¿Nunca te pasó estar en un lugar nuevo y sentir que ya habías estado ahí? Como si el presente no fuera del todo estable.",
+          "texto_en": "Have you ever been somewhere new and felt as if you had already been there? As if the present were not entirely stable.",
+          "resaltado_es": "¿Podría el déjà vu ser una dinámica neuronal interna que lleva al sistema a un estado similar al que había alcanzado al organizar una experiencia anterior?",
+          "resaltado_en": "Could déjà vu be an internal neural dynamic that brings the system into a state similar to one it had previously reached while organizing an earlier experience?"
+        },
+        {
+          "tipo": "imagenTexto",
+          "src": "assets/img/ribio-sintaxis.jpg",
+          "titulo_es": "Sintaxis neuronal",
+          "titulo_en": "Neural syntax",
+          "texto_es": "El cerebro in vivo se caracteriza por una actividad continua, organizada en un sistema jerárquico de ritmos y descargas poblacionales que emergen de sus circuitos. La información neuronal, entonces, no depende solamente de qué ocurre, sino también de cuándo y dentro de qué dinámica ocurre.\n\nLas redes neuronales tienen su propia sintaxis —reglas que organizan la información—, al igual que el lenguaje y otros códigos de comunicación entre un emisor y un receptor, como el código Morse.",
+          "texto_en": "The in vivo brain is characterized by continuous activity, organized within a hierarchical system of rhythms and population discharges that emerge from its circuits. Neural information, therefore, depends not only on what happens, but also on when it happens and within which dynamics.\n\nNeural networks have their own syntax—the rules governing the organization of information—just as language and other communication codes between a sender and a receiver do, such as Morse code.",
+          "resaltado_es": "",
+          "resaltado_en": ""
+        }
+      ]
+    }
+  ],
   "lineas": [
     {
       "id": "ultrasonidos",
@@ -272,7 +339,7 @@ window.SITE_DATA = {
           "tipo": "boton",
           "texto_es": "Conocé el curso",
           "texto_en": "Learn about the course",
-          "url": "ribio.html"
+          "url": "marco.html?id=ribio"
         },
         {
           "tipo": "boton",

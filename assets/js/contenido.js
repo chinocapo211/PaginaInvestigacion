@@ -9,6 +9,11 @@
 
   var DRAFT_KEY = "nn-admin-borrador";
 
+  /* MODO MAQUETA (true): lo que se cambia en admin.html se guarda solo en este navegador
+     y el sitio lo muestra directamente acá, sin publicar ni conectar con GitHub.
+     Para que los cambios se publiquen en GitHub para todo el mundo, poner false. */
+  var MODO_LOCAL = true;
+
   /* ---------- Valores por defecto (si data/contenido.js no los trae) ---------- */
   var DEFAULT_LINEAS = [
     { id: "ultrasonidos", destacada: true, imagen: "assets/img/linea-ultrasonidos.jpg",
@@ -42,7 +47,7 @@
     cursosUrl: "https://investigacion.itba.edu.ar/cursos-de-doctorado/"
   };
 
-  var LISTAS = ["lineas", "personas", "publicaciones", "subsidios", "noticias", "galeria"];
+  var LISTAS = ["marcos", "lineas", "personas", "publicaciones", "subsidios", "noticias", "galeria"];
 
   function copia(o) { return JSON.parse(JSON.stringify(o)); }
 
@@ -60,7 +65,15 @@
       if (d.contacto[k] === undefined) d.contacto[k] = DEFAULT_CONTACTO[k];
     });
     if (!Array.isArray(d.lineas)) d.lineas = copia(DEFAULT_LINEAS);
-    LISTAS.forEach(function (k) { if (!Array.isArray(d[k])) d[k] = []; });
+    // Secciones nuevas que un borrador viejo no tiene: se toman del archivo de datos
+    var archivo = window.SITE_DATA || {};
+    LISTAS.forEach(function (k) {
+      if (!Array.isArray(d[k])) d[k] = Array.isArray(archivo[k]) ? copia(archivo[k]) : [];
+    });
+    d.marcos.forEach(function (m) {
+      if (!Array.isArray(m.contenido)) m.contenido = [];
+      if (m.destacada === undefined) m.destacada = true;
+    });
 
     d.lineas.forEach(function (l) {
       if (!Array.isArray(l.contenido)) {
@@ -123,6 +136,7 @@
   }
 
   function lineaUrl(l) { return "linea.html?id=" + encodeURIComponent(l.id); }
+  function marcoUrl(m) { return "marco.html?id=" + encodeURIComponent(m.id); }
   function noticiaUrl(n) { return "noticia.html?id=" + encodeURIComponent(n.id); }
 
   function vacio(es, en) { return '<p class="empty-note">' + bi(es, en) + "</p>"; }
@@ -138,14 +152,18 @@
   function cargarDatos() {
     var data = window.SITE_DATA || null;
     var imagenes = {};
-    var preview = /[?&]vista-previa\b/.test(location.search);
-    if (preview) {
+    var cambios = false;
+    var preview = !MODO_LOCAL && /[?&]vista-previa\b/.test(location.search);
+    if (preview || MODO_LOCAL) {
       try {
         var b = JSON.parse(localStorage.getItem(DRAFT_KEY) || "null");
-        if (b && b.data) { data = b.data; imagenes = b.imagenes || {}; }
+        if (b && b.data) {
+          data = b.data; imagenes = b.imagenes || {};
+          cambios = JSON.stringify(b.data) !== b.base || Object.keys(imagenes).length > 0;
+        }
       } catch (e) { /* sin borrador */ }
     }
-    return { data: data ? normalizar(data) : null, imagenes: imagenes, preview: preview };
+    return { data: data ? normalizar(data) : null, imagenes: imagenes, preview: preview, cambiosLocales: cambios };
   }
 
   function img(path) {
@@ -208,11 +226,29 @@
       var u = safeUrl(b.url);
       if (!u || !b.texto_es) return "";
       return '<p class="art-btn">' + boton(u, b.texto_es, b.texto_en) + "</p>";
+    },
+    resaltado: function (b) {
+      return b.texto_es ? '<p class="question">' + bi(b.texto_es, b.texto_en) + "</p>" : "";
+    },
+    // Imagen con texto al lado; si hay varios seguidos, la imagen va alternando de lado
+    imagenTexto: function (b, n) {
+      var src = img(b.src);
+      return '<div class="topic' + (n % 2 ? " reverse" : "") + (src ? "" : " no-img") + '">' +
+        (src ? '<div class="topic-img"><img src="' + esc(src) + '" alt="" loading="lazy"></div>' : "") +
+        "<div>" + (b.titulo_es ? "<h2>" + bi(b.titulo_es, b.titulo_en) + "</h2>" : "") +
+        parrafos(b.texto_es, b.texto_en) +
+        (b.resaltado_es ? '<p class="question">' + bi(b.resaltado_es, b.resaltado_en) + "</p>" : "") +
+        "</div></div>";
     }
   };
 
   function bloquesHtml(lista) {
-    return (lista || []).map(function (b) { return BLOQUES[b.tipo] ? BLOQUES[b.tipo](b) : ""; }).join("");
+    var n = 0;
+    return (lista || []).map(function (b) {
+      if (!BLOQUES[b.tipo]) return "";
+      if (b.tipo !== "imagenTexto") { n = 0; return BLOQUES[b.tipo](b); }
+      return BLOQUES.imagenTexto(b, n++);
+    }).join("");
   }
 
   function articulo(item) {
@@ -246,6 +282,58 @@
 
   /* ---------- Bloques del HTML ---------- */
   var render = {
+    /* Marco conceptual */
+    "marcos-destacados": function (d) {
+      var lista = d.marcos.filter(function (m) { return m.destacada; });
+      if (!lista.length) return vacio("Próximamente.", "Coming soon.");
+      return lista.map(function (m) {
+        var foto = img(m.imagen);
+        return '<div class="marco" id="marco-' + esc(m.id) + '">' +
+          '<div class="section-head"><span class="eyebrow">' + bi("Marco conceptual", "Conceptual framework") + "</span>" +
+          "<h2>" + bi(m.titulo_es || m.nombre_es, m.titulo_en || m.nombre_en) + "</h2></div>" +
+          '<div class="framework">' +
+          (m.cita_es ? "<blockquote>" + bi(m.cita_es, m.cita_en) + "</blockquote>" : "<div></div>") +
+          '<a class="ribio-card" href="' + esc(marcoUrl(m)) + '">' +
+          (foto ? '<img src="' + esc(foto) + '" alt="' + esc(m.nombre_es) + '">' : "") +
+          (m.tarjeta_es ? "<p>" + bi(m.tarjeta_es, m.tarjeta_en) + "</p>" : "") +
+          '<span class="more">' + bi(m.boton_es || "Ver más →", m.boton_en || "Learn more →") + "</span></a>" +
+          "</div></div>";
+      }).join("");
+    },
+    "marcos-todos": function (d) {
+      if (!d.marcos.length) return vacio("Próximamente.", "Coming soon.");
+      return d.marcos.map(function (m) {
+        var foto = img(m.imagen);
+        return '<a class="line-card marco-card" id="marco-' + esc(m.id) + '" href="' + esc(marcoUrl(m)) + '">' +
+          '<div class="thumb">' + (foto ? '<img src="' + esc(foto) + '" alt="" loading="lazy">' : "") + "</div>" +
+          '<div class="body"><h3>' + bi(m.nombre_es, m.nombre_en) + "</h3>" +
+          "<p>" + bi(m.tarjeta_es || m.cita_es, m.tarjeta_en || m.cita_en) + "</p>" +
+          '<span class="more">' + bi("Ver más →", "Learn more →") + "</span></div></a>";
+      }).join("");
+    },
+    "marcos-mas": function (d) {
+      var dest = d.marcos.filter(function (m) { return m.destacada; }).length;
+      return d.marcos.length > dest ? boton("marcos.html", "Ver todos los marcos conceptuales", "See all conceptual frameworks") : "";
+    },
+    "marcos-footer": function (d) {
+      return d.marcos.map(function (m) {
+        return '<li><a href="' + esc(marcoUrl(m)) + '">' + bi(m.nombre_es, m.nombre_en) + "</a></li>";
+      }).join("");
+    },
+    "marco-hero": function (d) {
+      var m = porId(d.marcos, idUrl());
+      if (!m) return "<h1>" + bi("Marco conceptual no encontrado", "Conceptual framework not found") + "</h1>";
+      ponerTitulo(m.nombre_es, m.nombre_en);
+      return "<h1>" + bi(m.nombre_es, m.nombre_en) + "</h1>" + (m.bajada_es ? "<p>" + bi(m.bajada_es, m.bajada_en) + "</p>" : "");
+    },
+    "marco-cuerpo": function (d) {
+      var m = porId(d.marcos, idUrl());
+      if (!m) return '<p><a href="marcos.html">' + bi("Ver todos los marcos conceptuales", "See all conceptual frameworks") + "</a></p>";
+      var html = bloquesHtml(m.contenido);
+      if (!html && m.cita_es) html = "<blockquote class=\"art-quote\">" + bi(m.cita_es, m.cita_en) + "</blockquote>";
+      return '<article class="article article-wide">' + html + "</article>";
+    },
+
     /* Líneas de investigación */
     "lineas-destacadas": function (d) {
       var lista = d.lineas.filter(function (l) { return l.destacada; });
@@ -460,6 +548,16 @@
     var avisos = d.ajustes.mostrarAvisosEjemplo !== false;
     document.querySelectorAll("[data-aviso]").forEach(function (el) { el.hidden = !avisos; });
 
+    // Modo maqueta: avisar cuando lo que se ve incluye cambios hechos en el panel
+    if (MODO_LOCAL && ctx.cambiosLocales) {
+      var demo = document.createElement("div");
+      demo.className = "preview-bar demo-bar";
+      demo.innerHTML = '<span lang="es">Estás viendo cambios de demostración hechos en el panel: son solo locales y se ven únicamente en este navegador.</span>' +
+        '<span lang="en">You are viewing demo changes made in the admin panel: they are local only and visible just in this browser.</span>' +
+        ' · <a href="admin.html">Panel</a>';
+      document.body.insertBefore(demo, document.body.firstChild);
+    }
+
     if (ctx.preview) {
       var bar = document.createElement("div");
       bar.className = "preview-bar";
@@ -483,8 +581,10 @@
 
   window.SITE_NORMALIZAR = normalizar;
   window.SITE_LINEA_URL = lineaUrl;
+  window.SITE_MARCO_URL = marcoUrl;
   window.SITE_NOTICIA_URL = noticiaUrl;
   window.SITE_DRAFT_KEY = DRAFT_KEY;
+  window.SITE_MODO_LOCAL = MODO_LOCAL;
 
   document.addEventListener("DOMContentLoaded", aplicar);
 })();

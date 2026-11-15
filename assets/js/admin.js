@@ -6,6 +6,7 @@
   var normalizar = window.SITE_NORMALIZAR;
   var lineaUrl = window.SITE_LINEA_URL;
   var noticiaUrl = window.SITE_NOTICIA_URL;
+  var LOCAL = !!window.SITE_MODO_LOCAL; // modo maqueta: sin GitHub, todo queda en este navegador
 
   /* ---------- Bloques para armar las páginas de noticias y líneas ---------- */
   var TIPOS_BLOQUE = {
@@ -27,7 +28,16 @@
       ayuda: "Un dato por renglón, con el formato: número o valor | descripción. Se muestran como recuadros." },
     boton: { nombre: "Botón", campos: [
       { fila: [{ k: "texto_es", label: "Texto del botón (español)" }, { k: "texto_en", label: "Texto del botón (inglés)" }] },
-      { k: "url", label: "Enlace", tipo: "url", ph: "https://... o ribio.html" }] }
+      { k: "url", label: "Enlace", tipo: "url", ph: "https://... o noticias.html" }] },
+    resaltado: { nombre: "Texto resaltado", campos: [
+      { fila: [{ k: "texto_es", label: "Texto resaltado (español)", tipo: "textarea" }, { k: "texto_en", label: "Texto resaltado (inglés)", tipo: "textarea" }] }],
+      ayuda: "Una frase o pregunta que se destaca en color." },
+    imagenTexto: { nombre: "Imagen con texto al lado", campos: [
+      { k: "src", label: "Imagen", tipo: "imagen" },
+      { fila: [{ k: "titulo_es", label: "Título (español, opcional)" }, { k: "titulo_en", label: "Título (inglés)" }] },
+      { fila: [{ k: "texto_es", label: "Texto (español)", tipo: "textarea" }, { k: "texto_en", label: "Texto (inglés)", tipo: "textarea" }] },
+      { fila: [{ k: "resaltado_es", label: "Frase resaltada (español, opcional)", tipo: "textarea" }, { k: "resaltado_en", label: "Frase resaltada (inglés)", tipo: "textarea" }] }],
+      ayuda: "Si ponés varios seguidos, la imagen va alternando de lado. Para separar párrafos, dejá una línea en blanco." }
   };
   var GH_KEY = "nn-admin-github";
   var DATA_PATH = "data/contenido.js";
@@ -35,6 +45,51 @@
 
   /* ---------- Listas editables ---------- */
   var SECCIONES = {
+    marcos: {
+      titulo: "Marco conceptual", singular: "marco conceptual", destacable: true, ancho: true,
+      ayuda: "Cada marco conceptual tiene su propia página. Los destacados (★) aparecen en la sección “Marco conceptual” de la portada. Si hay más marcos que destacados, aparece el botón “Ver todos los marcos conceptuales”.",
+      campos: [
+        { seccion: "En la portada" },
+        { fila: [
+          { k: "titulo_es", label: "Título de la sección (español)", req: true, ph: "La información como código dinámico" },
+          { k: "titulo_en", label: "Título de la sección (inglés)" }
+        ] },
+        { fila: [
+          { k: "cita_es", label: "Texto principal (español)", tipo: "textarea", ayuda: "La frase grande de la izquierda." },
+          { k: "cita_en", label: "Texto principal (inglés)", tipo: "textarea" }
+        ] },
+        { k: "imagen", label: "Imagen de la tarjeta", tipo: "imagen", carpeta: "marcos", max: 1200, cuadrada: false, ayuda: "Por ejemplo, un logo. Aparece en la tarjeta de la derecha." },
+        { fila: [
+          { k: "tarjeta_es", label: "Texto de la tarjeta (español)", tipo: "textarea" },
+          { k: "tarjeta_en", label: "Texto de la tarjeta (inglés)", tipo: "textarea" }
+        ] },
+        { fila: [
+          { k: "boton_es", label: "Texto del enlace (español)", ph: "Conocé el curso →" },
+          { k: "boton_en", label: "Texto del enlace (inglés)", ph: "Learn about the course →" }
+        ] },
+        { k: "destacada", label: "★ Destacado: mostrar en la portada", tipo: "check" },
+        { seccion: "Página del marco conceptual" },
+        { fila: [
+          { k: "nombre_es", label: "Título de la página (español)", req: true, ph: "RIBio · Marco conceptual" },
+          { k: "nombre_en", label: "Título de la página (inglés)" }
+        ] },
+        { fila: [
+          { k: "bajada_es", label: "Bajada (español)", ph: "Redes de Información Biológica · Curso de doctorado · ITBA" },
+          { k: "bajada_en", label: "Bajada (inglés)" }
+        ] },
+        { k: "contenido", tipo: "bloques", carpeta: "marcos" }
+      ],
+      resumen: function (m) { return [m.nombre_es, m.titulo_es]; },
+      thumb: function (m) { return { foto: m.imagen, texto: "", cuadrada: true }; },
+      etiqueta: function (m) { return m.destacada ? { t: "★ Destacado", cls: "star" } : { t: "No destacado", cls: "muted" }; },
+      donde: function (m) {
+        return [
+          m.destacada ? ["Portada", "index.html#marco-" + m.id] : null,
+          ["Todos los marcos", "marcos.html#marco-" + m.id],
+          ["Su página", window.SITE_MARCO_URL(m)]
+        ];
+      }
+    },
     lineas: {
       titulo: "Líneas de investigación", singular: "línea", destacable: true, ancho: true,
       ayuda: "Cada línea tiene su propia página. Las destacadas (★) aparecen en la portada; se recomiendan 3. Si hay más líneas que destacadas, la portada muestra el botón “Ver todas las líneas”.",
@@ -203,7 +258,7 @@
 
   /* ---------- Estado ---------- */
   var state = { data: null, base: "", imagenes: {} };
-  var tabActual = "lineas";
+  var tabActual = "marcos";
   var $ = function (sel) { return document.querySelector(sel); };
 
   function clone(o) { return JSON.parse(JSON.stringify(o)); }
@@ -266,12 +321,12 @@
     if (borrador && borrador.data) {
       var conCambios = JSON.stringify(borrador.data) !== borrador.base || Object.keys(borrador.imagenes || {}).length;
       var viejo = Date.now() - (borrador.guardado || 0) > 15 * 60 * 1000;
-      if (conCambios || (!viejo && borrador.base !== publicadoJson)) {
+      if (conCambios || (!LOCAL && !viejo && borrador.base !== publicadoJson)) {
         // Hay cambios sin publicar, o se publicó hace poco y el sitio todavía no se actualizó
         state.data = normalizar(borrador.data);
         state.base = borrador.base;
         state.imagenes = borrador.imagenes || {};
-        if (conCambios) {
+        if (conCambios && !LOCAL) {
           aviso("info", "Se recuperaron cambios que todavía no publicaste" +
             (borrador.guardado ? " (guardados el " + new Date(borrador.guardado).toLocaleString("es-AR", { dateStyle: "short", timeStyle: "short", hourCycle: "h23" }) + ")" : "") + ".");
           if (borrador.base !== publicadoJson) {
@@ -298,6 +353,12 @@
 
   function actualizarEstado() {
     var dirty = hayCambios();
+    if (LOCAL) {
+      $("#estado").textContent = "Demostración · cambios solo locales";
+      $("#estado").className = "adm-pill ok";
+      $("#btn-descartar").hidden = !dirty;
+      return;
+    }
     var pill = $("#estado");
     pill.textContent = dirty ? "Cambios sin publicar" : "Todo publicado";
     pill.className = "adm-pill " + (dirty ? "dirty" : "ok");
@@ -325,6 +386,7 @@
 
   // Abre el sitio (con el borrador) en el lugar donde aparece cada cosa
   function urlPreview(url) {
+    if (LOCAL) return url; // en modo maqueta el sitio ya muestra los cambios
     var m = url.match(/^([^?#]*)(\?[^#]*)?(#.*)?$/);
     return m[1] + (m[2] ? m[2] + "&vista-previa" : "?vista-previa") + (m[3] || "");
   }
@@ -680,7 +742,7 @@
       return;
     }
     Object.keys(item).forEach(function (k) { if (/__pendiente$/.test(k)) delete item[k]; });
-    if (sec.destacable && edicion.index < 0) item.id = idUnico(state.data[edicion.tab], item.titulo_es, item);
+    if (sec.destacable && edicion.index < 0) item.id = idUnico(state.data[edicion.tab], item.nombre_es || item.titulo_es, item);
     if (edicion.index >= 0) state.data[edicion.tab][edicion.index] = item;
     else state.data[edicion.tab].push(item);
     $("#editor").close();
@@ -964,12 +1026,22 @@
     $("#editor").addEventListener("cancel", function (ev) { ev.preventDefault(); cerrarEditor(); });
 
     $("#btn-publicar").addEventListener("click", publicar);
+    if (LOCAL) {
+      $("#btn-publicar").hidden = true;
+      $("#btn-preview").textContent = "Ver sitio ↗";
+      $("#btn-descartar").textContent = "Volver al contenido original";
+      $("#nota-local").hidden = false;
+      var tabGh = document.querySelector('#tabs [data-tab="publicacion"]');
+      if (tabGh) tabGh.hidden = true;
+    }
     $("#btn-preview").addEventListener("click", function () {
       guardarBorrador();
-      window.open("index.html?vista-previa", "_blank");
+      window.open(LOCAL ? "index.html" : "index.html?vista-previa", "_blank");
     });
     $("#btn-descartar").addEventListener("click", function () {
-      if (!confirm("¿Descartar todos los cambios sin publicar?")) return;
+      if (!confirm(LOCAL
+        ? "¿Borrar todos tus cambios y volver al contenido original del sitio?"
+        : "¿Descartar todos los cambios sin publicar?")) return;
       try { localStorage.removeItem(DRAFT_KEY); } catch (e) { /* nada */ }
       state.data = normalizar(JSON.parse(state.base));
       state.imagenes = {};
@@ -980,7 +1052,7 @@
 
     var inicial = (location.hash || "").slice(1);
     var validas = Object.keys(SECCIONES).concat(Object.keys(OBJETOS), ["publicacion"]);
-    mostrarTab(validas.indexOf(inicial) !== -1 ? inicial : "lineas");
+    mostrarTab(validas.indexOf(inicial) !== -1 ? inicial : "marcos");
   }
 
   if (!window.SITE_DATA || !normalizar) {

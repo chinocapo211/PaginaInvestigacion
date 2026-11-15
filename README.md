@@ -7,14 +7,15 @@ Se puede publicar directamente con GitHub Pages (Settings → Pages → rama y c
 
 | Archivo | Contenido |
 |---|---|
-| `index.html` | Portada: marco conceptual, líneas destacadas, personas, publicaciones, subsidios, noticias destacadas, vida del lab, contacto |
-| `ribio.html` | RIBio · Marco conceptual (se abre desde el logo de RIBio) |
+| `index.html` | Portada: marcos conceptuales destacados, líneas destacadas, personas, publicaciones, subsidios, noticias destacadas, vida del lab, contacto |
+| `marcos.html` | Todos los marcos conceptuales (botón "Ver todos los marcos conceptuales") |
+| `marco.html?id=...` | Página de cada marco conceptual (por ejemplo `marco.html?id=ribio`) |
 | `lineas.html` | Todas las líneas de investigación (botón "Ver todas las líneas") |
 | `linea.html?id=...` | Página de cada línea de investigación |
 | `noticias.html` | Todas las noticias (botón "Ver todas las noticias") |
 | `noticia.html?id=...` | Página de cada noticia |
 | `admin.html` | Panel de administración (link "Admin" en el pie de página) |
-| `linea-ultrasonidos.html`, `linea-desorientacion.html`, `linea-navegacion.html` | Solo redirigen a `linea.html?id=...` (para no romper links viejos) |
+| `linea-ultrasonidos.html`, `linea-desorientacion.html`, `linea-navegacion.html`, `ribio.html` | Solo redirigen a la página nueva (para no romper links viejos) |
 
 ## Idiomas (español / inglés)
 
@@ -28,6 +29,10 @@ Cada texto está escrito dos veces, una por idioma:
 Al editar un texto, cambiar ambas versiones.
 
 ## Panel de administración (`admin.html`)
+
+> **Modo maqueta (activado):** los cambios del panel se guardan solo en el navegador de quien los hace y el sitio
+> los muestra ahí mismo, sin publicar ni conectar con GitHub. "Volver al contenido original" los borra.
+> Para pasar a publicar de verdad en GitHub, cambiar `MODO_LOCAL = true` por `false` en `assets/js/contenido.js`.
 
 Líneas de investigación, personas, noticias, publicaciones, subsidios, fotos de "Vida del lab", datos de contacto
 y los recuadros amarillos de "Contenido de ejemplo" se editan desde el panel, sin tocar código.
