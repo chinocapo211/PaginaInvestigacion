@@ -34,13 +34,18 @@ Al editar un texto, cambiar ambas versiones.
 > los muestra ahí mismo, sin publicar ni conectar con GitHub. "Volver al contenido original" los borra.
 > Para pasar a publicar de verdad en GitHub, cambiar `MODO_LOCAL = true` por `false` en `assets/js/contenido.js`.
 
-Líneas de investigación, personas, noticias, publicaciones, subsidios, fotos de "Vida del lab", datos de contacto
+Líneas de investigación, personas, noticias, publicaciones, subsidios, fotos de "Vida de laboratorio", datos de contacto
 y los recuadros amarillos de "Contenido de ejemplo" se editan desde el panel, sin tocar código.
 
-- **Páginas de noticias y líneas:** cada noticia y cada línea tiene su propia página, que se arma desde el panel
-  con bloques: títulos, subtítulos, textos, imágenes con epígrafe, listas, datos destacados y botones.
-- **Destacadas:** las noticias y líneas marcadas con ★ salen en la portada. Si hay más que las destacadas,
-  aparece el botón "Ver todas las noticias" / "Ver todas las líneas".
+- **Páginas con bloques:** cada noticia, línea y marco conceptual tiene su propia página, que se arma desde el panel
+  con bloques: títulos, subtítulos, textos, imágenes con epígrafe, listas, datos destacados, botones, texto resaltado
+  e imagen con texto al lado.
+- **Destacados por orden:** en la portada salen los primeros de cada lista: 1 marco conceptual, y la cantidad de
+  noticias y de líneas que se elija en Ajustes (por defecto 1 y 3). El resto se ve con los botones "Ver todos/as".
+  Las noticias nuevas se agregan arriba de la lista.
+- **Mapa:** en Contacto se puede pegar el link de Google Maps (o el código de "Insertar un mapa"); el panel muestra
+  cómo queda antes de guardarlo.
+- El panel tiene una guía "¿Cómo funciona este panel?" que explica todo esto.
 - Cada elemento del panel muestra dónde aparece en el sitio, con un link que lleva directo a él.
 
 - Los datos viven en `data/contenido.js`. Las páginas los dibujan con `assets/js/contenido.js` en los

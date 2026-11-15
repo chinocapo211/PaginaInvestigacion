@@ -10,29 +10,29 @@
 
   /* ---------- Bloques para armar las páginas de noticias y líneas ---------- */
   var TIPOS_BLOQUE = {
-    titulo: { nombre: "Título", campos: [
+    titulo: { nombre: "Título", icono: "T", desc: "Un título grande para empezar una parte.", campos: [
       { fila: [{ k: "texto_es", label: "Título (español)" }, { k: "texto_en", label: "Título (inglés)" }] }] },
-    subtitulo: { nombre: "Subtítulo", campos: [
+    subtitulo: { nombre: "Subtítulo", icono: "t", desc: "Un título más chico, dentro de una parte.", campos: [
       { fila: [{ k: "texto_es", label: "Subtítulo (español)" }, { k: "texto_en", label: "Subtítulo (inglés)" }] }] },
-    parrafo: { nombre: "Texto", campos: [
+    parrafo: { nombre: "Texto", icono: "¶", desc: "Uno o varios párrafos de texto.", campos: [
       { fila: [{ k: "texto_es", label: "Texto (español)", tipo: "textarea" }, { k: "texto_en", label: "Texto (inglés)", tipo: "textarea" }] }],
       ayuda: "Para separar párrafos, dejá una línea en blanco." },
-    imagen: { nombre: "Imagen", campos: [
+    imagen: { nombre: "Imagen", icono: "▣", desc: "Una foto o ilustración, con epígrafe opcional.", campos: [
       { k: "src", label: "Imagen", tipo: "imagen" },
       { fila: [{ k: "pie_es", label: "Epígrafe (español, opcional)" }, { k: "pie_en", label: "Epígrafe (inglés)" }] }] },
-    lista: { nombre: "Lista", campos: [
+    lista: { nombre: "Lista", icono: "•", desc: "Puntos, uno debajo del otro.", campos: [
       { fila: [{ k: "items_es", label: "Puntos (español)", tipo: "textarea" }, { k: "items_en", label: "Puntos (inglés)", tipo: "textarea" }] }],
       ayuda: "Un punto por renglón." },
-    datos: { nombre: "Datos destacados", campos: [
+    datos: { nombre: "Datos destacados", icono: "#", desc: "Números o datos clave en recuadros.", campos: [
       { fila: [{ k: "items_es", label: "Datos (español)", tipo: "textarea", ph: "~22 kHz | Llamadas largas…" }, { k: "items_en", label: "Datos (inglés)", tipo: "textarea", ph: "~22 kHz | Long calls…" }] }],
       ayuda: "Un dato por renglón, con el formato: número o valor | descripción. Se muestran como recuadros." },
-    boton: { nombre: "Botón", campos: [
+    boton: { nombre: "Botón", icono: "↗", desc: "Un botón que lleva a otra página.", campos: [
       { fila: [{ k: "texto_es", label: "Texto del botón (español)" }, { k: "texto_en", label: "Texto del botón (inglés)" }] },
       { k: "url", label: "Enlace", tipo: "url", ph: "https://... o noticias.html" }] },
-    resaltado: { nombre: "Texto resaltado", campos: [
+    resaltado: { nombre: "Texto resaltado", icono: "❝", desc: "Una frase o pregunta destacada en color.", campos: [
       { fila: [{ k: "texto_es", label: "Texto resaltado (español)", tipo: "textarea" }, { k: "texto_en", label: "Texto resaltado (inglés)", tipo: "textarea" }] }],
       ayuda: "Una frase o pregunta que se destaca en color." },
-    imagenTexto: { nombre: "Imagen con texto al lado", campos: [
+    imagenTexto: { nombre: "Imagen con texto al lado", icono: "◧", desc: "Imagen a un costado y texto al otro.", campos: [
       { k: "src", label: "Imagen", tipo: "imagen" },
       { fila: [{ k: "titulo_es", label: "Título (español, opcional)" }, { k: "titulo_en", label: "Título (inglés)" }] },
       { fila: [{ k: "texto_es", label: "Texto (español)", tipo: "textarea" }, { k: "texto_en", label: "Texto (inglés)", tipo: "textarea" }] },
@@ -46,55 +46,44 @@
   /* ---------- Listas editables ---------- */
   var SECCIONES = {
     marcos: {
-      titulo: "Marco conceptual", singular: "marco conceptual", destacable: true, ancho: true,
-      ayuda: "Cada marco conceptual tiene su propia página. Los destacados (★) aparecen en la sección “Marco conceptual” de la portada. Si hay más marcos que destacados, aparece el botón “Ver todos los marcos conceptuales”.",
+      titulo: "Marcos conceptuales", singular: "marco conceptual", conPagina: true, ancho: true,
+      limite: function () { return 1; }, enPortadaTexto: "el marco conceptual de la portada",
+      ayuda: "Cada marco conceptual tiene su propia página. El primero de la lista es el destacado: es el único que aparece en la portada. Los demás se ven con el botón “Ver todos los marcos conceptuales”. Usá las flechas para elegir cuál va primero.",
       campos: [
-        { seccion: "En la portada" },
+        { paso: 1, titulo: "Cómo se ve desde afuera",
+          texto: "Es la tarjeta que presenta al marco conceptual: aparece en la portada (si este marco está primero en la lista) y en “Ver todos los marcos conceptuales”. Solo lleva una imagen, un título y una descripción corta." },
+        { k: "imagen", label: "Imagen", tipo: "imagen", carpeta: "marcos", max: 1200, cuadrada: false, ayuda: "Por ejemplo, un logo o una ilustración." },
         { fila: [
-          { k: "titulo_es", label: "Título de la sección (español)", req: true, ph: "La información como código dinámico" },
-          { k: "titulo_en", label: "Título de la sección (inglés)" }
+          { k: "titulo_es", label: "Título (español)", req: true, ph: "La información como código dinámico" },
+          { k: "titulo_en", label: "Título (inglés)" }
         ] },
         { fila: [
-          { k: "cita_es", label: "Texto principal (español)", tipo: "textarea", ayuda: "La frase grande de la izquierda." },
-          { k: "cita_en", label: "Texto principal (inglés)", tipo: "textarea" }
+          { k: "descripcion_es", label: "Descripción (español)", tipo: "textarea", req: true, ayuda: "Una o dos oraciones que expliquen la idea." },
+          { k: "descripcion_en", label: "Descripción (inglés)", tipo: "textarea" }
         ] },
-        { k: "imagen", label: "Imagen de la tarjeta", tipo: "imagen", carpeta: "marcos", max: 1200, cuadrada: false, ayuda: "Por ejemplo, un logo. Aparece en la tarjeta de la derecha." },
-        { fila: [
-          { k: "tarjeta_es", label: "Texto de la tarjeta (español)", tipo: "textarea" },
-          { k: "tarjeta_en", label: "Texto de la tarjeta (inglés)", tipo: "textarea" }
-        ] },
-        { fila: [
-          { k: "boton_es", label: "Texto del enlace (español)", ph: "Conocé el curso →" },
-          { k: "boton_en", label: "Texto del enlace (inglés)", ph: "Learn about the course →" }
-        ] },
-        { k: "destacada", label: "★ Destacado: mostrar en la portada", tipo: "check" },
-        { seccion: "Página del marco conceptual" },
-        { fila: [
-          { k: "nombre_es", label: "Título de la página (español)", req: true, ph: "RIBio · Marco conceptual" },
-          { k: "nombre_en", label: "Título de la página (inglés)" }
-        ] },
-        { fila: [
-          { k: "bajada_es", label: "Bajada (español)", ph: "Redes de Información Biológica · Curso de doctorado · ITBA" },
-          { k: "bajada_en", label: "Bajada (inglés)" }
-        ] },
+        { tipo: "vistaTarjeta" },
+        { paso: 2, titulo: "Cómo se ve la página",
+          texto: "Es lo que se abre al hacer clic en la tarjeta. Arriba de todo ya aparecen el título y la descripción de arriba; debajo va lo que armes acá, sumando bloques uno debajo del otro." },
         { k: "contenido", tipo: "bloques", carpeta: "marcos" }
       ],
-      resumen: function (m) { return [m.nombre_es, m.titulo_es]; },
+      tarjeta: { img: "imagen", titulo: "titulo_es", texto: "descripcion_es" },
+      resumen: function (m) { return [m.titulo_es, m.descripcion_es]; },
       thumb: function (m) { return { foto: m.imagen, texto: "", cuadrada: true }; },
-      etiqueta: function (m) { return m.destacada ? { t: "★ Destacado", cls: "star" } : { t: "No destacado", cls: "muted" }; },
-      donde: function (m) {
+      donde: function (m, i) {
         return [
-          m.destacada ? ["Portada", "index.html#marco-" + m.id] : null,
+          i < 1 ? ["Portada", "index.html#marco-" + m.id] : null,
           ["Todos los marcos", "marcos.html#marco-" + m.id],
           ["Su página", window.SITE_MARCO_URL(m)]
         ];
       }
     },
     lineas: {
-      titulo: "Líneas de investigación", singular: "línea", destacable: true, ancho: true,
-      ayuda: "Cada línea tiene su propia página. Las destacadas (★) aparecen en la portada; se recomiendan 3. Si hay más líneas que destacadas, la portada muestra el botón “Ver todas las líneas”.",
+      titulo: "Líneas de investigación", singular: "línea", conPagina: true, ancho: true,
+      limite: function (d) { return d.ajustes.portadaLineas; }, enPortadaTexto: "las líneas de la portada",
+      ayuda: "Cada línea tiene su propia página. Las primeras de la lista son las destacadas y aparecen en la portada (cuántas, se elige en Ajustes). Las demás se ven con el botón “Ver todas las líneas”. Usá las flechas ↑ ↓ para elegir el orden.",
       campos: [
-        { seccion: "Tarjeta (lo que se ve en la portada y en la lista de líneas)" },
+        { paso: 1, titulo: "Cómo se ve desde afuera",
+          texto: "Es la tarjeta de la línea: aparece en la portada (si está entre las primeras de la lista) y en “Ver todas las líneas”." },
         { fila: [
           { k: "titulo_es", label: "Título (español)", req: true },
           { k: "titulo_en", label: "Título (inglés)" }
@@ -108,16 +97,17 @@
           { k: "resumen_en", label: "Resumen (inglés)", tipo: "textarea" }
         ] },
         { k: "imagen", label: "Imagen de portada", tipo: "imagen", carpeta: "lineas", max: 1600, cuadrada: false, ayuda: "Aparece en la tarjeta y arriba de la página." },
-        { k: "destacada", label: "★ Destacada: mostrar en la portada", tipo: "check" },
-        { seccion: "Página de la línea" },
+        { tipo: "vistaTarjeta" },
+        { paso: 2, titulo: "Cómo se ve la página",
+          texto: "Es lo que se abre al hacer clic en la tarjeta. Arriba aparecen el título y el resumen; debajo va lo que armes acá con bloques. Las personas y publicaciones de la línea se agregan solas al final." },
         { k: "contenido", tipo: "bloques", carpeta: "lineas" }
       ],
+      tarjeta: { img: "imagen", titulo: "titulo_es", texto: "resumen_es", mas: "Ver proyecto →" },
       resumen: function (l) { return [l.titulo_es, l.corto_es || ""]; },
       thumb: function (l) { return { foto: l.imagen, texto: "", cuadrada: true }; },
-      etiqueta: function (l) { return l.destacada ? { t: "★ Destacada", cls: "star" } : { t: "No destacada", cls: "muted" }; },
-      donde: function (l) {
+      donde: function (l, i, enPortada) {
         return [
-          l.destacada ? ["Portada", "index.html#linea-" + l.id] : null,
+          enPortada ? ["Portada", "index.html#linea-" + l.id] : null,
           ["Todas las líneas", "lineas.html#linea-" + l.id],
           ["Su página", lineaUrl(l)]
         ];
@@ -125,7 +115,7 @@
     },
     personas: {
       titulo: "Personas", singular: "persona",
-      ayuda: "Integrantes del laboratorio. Aparecen en la portada y en la página de cada línea de investigación que tengan marcada.",
+      ayuda: "Integrantes del laboratorio. Todas aparecen en la sección Personas de la portada, en este orden. Además, cada persona aparece en la página de las líneas de investigación que le marques.",
       campos: [
         { k: "nombre", label: "Nombre y apellido", req: true },
         { fila: [
@@ -143,10 +133,12 @@
       }
     },
     noticias: {
-      titulo: "Noticias", singular: "noticia", destacable: true, ancho: true,
-      ayuda: "Cada noticia tiene su propia página. Las destacadas (★) aparecen en la portada; el resto se ve con el botón “Ver todas las noticias”. En la lista de noticias se muestran en este orden (usá las flechas para ordenarlas).",
+      titulo: "Noticias", singular: "noticia", conPagina: true, ancho: true, nuevasArriba: true,
+      limite: function (d) { return d.ajustes.portadaNoticias; }, enPortadaTexto: "las noticias de la portada",
+      ayuda: "Cada noticia tiene su propia página. Las primeras de la lista son las destacadas y aparecen en la portada (cuántas, se elige en Ajustes). Las demás se ven con el botón “Ver todas las noticias”. Las noticias nuevas se agregan arriba de todo; usá las flechas ↑ ↓ para cambiar el orden.",
       campos: [
-        { seccion: "Tarjeta (lo que se ve en la portada y en la lista de noticias)" },
+        { paso: 1, titulo: "Cómo se ve desde afuera",
+          texto: "Es la tarjeta de la noticia: aparece en la portada (si está entre las primeras de la lista) y en “Ver todas las noticias”." },
         { k: "fecha", label: "Fecha", ph: "Marzo 2026", req: true },
         { fila: [
           { k: "titulo_es", label: "Título (español)", req: true },
@@ -157,16 +149,17 @@
           { k: "texto_en", label: "Resumen (inglés)", tipo: "textarea" }
         ] },
         { k: "imagen", label: "Imagen de portada (opcional)", tipo: "imagen", carpeta: "noticias", max: 1600, cuadrada: false, ayuda: "Aparece en la tarjeta y arriba de la página." },
-        { k: "destacada", label: "★ Destacada: mostrar en la portada", tipo: "check" },
-        { seccion: "Página de la noticia" },
+        { tipo: "vistaTarjeta" },
+        { paso: 2, titulo: "Cómo se ve la página",
+          texto: "Es lo que se abre al hacer clic en la tarjeta. Arriba aparecen la fecha, el título y el resumen; debajo va lo que armes acá con bloques." },
         { k: "contenido", tipo: "bloques", carpeta: "noticias" }
       ],
+      tarjeta: { img: "imagen", titulo: "titulo_es", texto: "texto_es", fecha: "fecha", mas: "Leer más →" },
       resumen: function (n) { return [n.titulo_es, n.fecha]; },
       thumb: function (n) { return { foto: n.imagen, texto: "", cuadrada: true }; },
-      etiqueta: function (n) { return n.destacada ? { t: "★ Destacada", cls: "star" } : { t: "No destacada", cls: "muted" }; },
-      donde: function (n) {
+      donde: function (n, i, enPortada) {
         return [
-          n.destacada ? ["Portada", "index.html#noticia-" + n.id] : null,
+          enPortada ? ["Portada", "index.html#noticia-" + n.id] : null,
           ["Todas las noticias", "noticias.html#noticia-" + n.id],
           ["Su página", noticiaUrl(n)]
         ];
@@ -192,7 +185,7 @@
     },
     subsidios: {
       titulo: "Subsidios", singular: "subsidio",
-      ayuda: "Se muestran en la portada en este orden.",
+      ayuda: "Todos los subsidios aparecen en la sección Subsidios de la portada, en el orden de esta lista.",
       campos: [
         { fila: [
           { k: "periodo", label: "Período", ph: "2025 – 2028", req: true },
@@ -205,8 +198,8 @@
       donde: function (s) { return [["Portada", "index.html#subsidio-" + s.id]]; }
     },
     galeria: {
-      titulo: "Vida del lab", singular: "foto",
-      ayuda: "Galería de fotos de la portada. Si una tarjeta no tiene foto, se muestra un recuadro con el texto.",
+      titulo: "Vida de laboratorio", singular: "foto",
+      ayuda: "Galería de la sección Vida de laboratorio de la portada, en el orden de esta lista. Si una tarjeta no tiene foto, se muestra un recuadro gris con la descripción.",
       campos: [
         { k: "foto", label: "Foto", tipo: "imagen", carpeta: "vida-del-lab", max: 1400, cuadrada: false },
         { k: "texto_es", label: "Descripción (español)", req: true },
@@ -242,7 +235,10 @@
           { k: "ciudad_es", label: "Ciudad y país (español)" },
           { k: "ciudad_en", label: "Ciudad y país (inglés)" }
         ] },
-        { k: "mapa", label: "Dirección para el mapa", ayuda: "Lo que se busca en Google Maps para mostrar el mapa. Si queda vacío, se usan la calle y la ciudad." },
+        { seccion: "Mapa" },
+        { k: "mapaLink", label: "Link de Google Maps", tipo: "mapa" },
+        { k: "mapa", label: "Dirección para buscar en el mapa (si no pegás un link)", ph: "Iguazú 341, Buenos Aires, Argentina",
+          ayuda: "Solo se usa si el link de arriba queda vacío o no alcanza para ubicar el lugar. Si también queda vacía, se usan la calle y la ciudad." },
         { k: "cursosUrl", label: "Enlace a cursos de doctorado", tipo: "url" }
       ]
     },
@@ -250,6 +246,15 @@
       titulo: "Ajustes",
       ayuda: "Opciones generales del sitio.",
       campos: [
+        { seccion: "Qué aparece en la portada" },
+        { fila: [
+          { k: "portadaNoticias", label: "Cantidad de noticias en la portada", tipo: "numero",
+            ayuda: "Se muestran las primeras de la lista de Noticias. Si hay más, aparece el botón “Ver todas las noticias”." },
+          { k: "portadaLineas", label: "Cantidad de líneas en la portada", tipo: "numero",
+            ayuda: "Se muestran las primeras de la lista de Líneas. Si hay más, aparece el botón “Ver todas las líneas”." }
+        ] },
+        { tipo: "nota", texto: "Marcos conceptuales: en la portada aparece siempre uno solo, el primero de su lista." },
+        { seccion: "Avisos" },
         { k: "mostrarAvisosEjemplo", tipo: "check", label: "Mostrar los recuadros amarillos de “Contenido de ejemplo”",
           ayuda: "Desmarcalo cuando hayas reemplazado el contenido de ejemplo por el real." }
       ]
@@ -258,7 +263,7 @@
 
   /* ---------- Estado ---------- */
   var state = { data: null, base: "", imagenes: {} };
-  var tabActual = "marcos";
+  var tabActual = "noticias";
   var $ = function (sel) { return document.querySelector(sel); };
 
   function clone(o) { return JSON.parse(JSON.stringify(o)); }
@@ -416,17 +421,20 @@
     if (!lista.length) {
       html += '<p class="adm-empty">Todavía no hay nada cargado.</p>';
     } else {
+      var limite = sec.limite ? sec.limite(state.data) : Infinity;
       html += '<ol class="adm-list">' + lista.map(function (it, i) {
         var r = sec.resumen(it, i);
-        var tag = sec.etiqueta ? sec.etiqueta(it, i) : null;
-        return '<li class="adm-item">' +
+        var enPortada = i < limite;
+        var tag = sec.limite && enPortada ? { t: "★ Destacada · en la portada", cls: "star" } : (sec.etiqueta ? sec.etiqueta(it, i) : null);
+        var divisor = sec.limite && i === limite
+          ? '<li class="adm-divider">Desde acá para abajo no aparecen en la portada: se ven con el botón “Ver todas”.</li>' : "";
+        return divisor + '<li class="adm-item' + (sec.limite && enPortada ? " featured" : "") + '">' +
           (sec.thumb ? thumbHtml(sec.thumb(it)) : "") +
           '<div class="adm-sum"><strong>' + esc(r[0] || "(sin título)") +
           (tag ? ' <em class="adm-tag ' + tag.cls + '">' + esc(tag.t) + "</em>" : "") + "</strong>" +
           (r[1] ? '<span class="adm-sub">' + esc(r[1]) + "</span>" : "") +
-          (sec.donde ? dondeHtml(sec.donde(it, i)) : "") + "</div>" +
+          (sec.donde ? dondeHtml(sec.donde(it, i, enPortada)) : "") + "</div>" +
           '<div class="adm-actions">' +
-          (sec.destacable ? '<button type="button" class="adm-btn small ghost" data-accion="destacar" data-i="' + i + '">' + (it.destacada ? "Quitar de portada" : "★ Destacar") + "</button>" : "") +
           '<button type="button" class="adm-btn small ghost" data-accion="subir" data-i="' + i + '" title="Mover arriba" aria-label="Mover arriba"' + (i === 0 ? " disabled" : "") + ">↑</button>" +
           '<button type="button" class="adm-btn small ghost" data-accion="bajar" data-i="' + i + '" title="Mover abajo" aria-label="Mover abajo"' + (i === lista.length - 1 ? " disabled" : "") + ">↓</button>" +
           '<button type="button" class="adm-btn small" data-accion="editar" data-i="' + i + '">Editar</button>' +
@@ -447,15 +455,13 @@
       var it = lista[i];
       var nombre = sec.resumen(it)[0] || sec.singular;
       var extra = tabActual === "lineas" ? " También se quita de las personas y publicaciones que la tengan marcada." : "";
-      if (!confirm("¿Eliminar “" + nombre + "”? Se quita del sitio cuando publiques." + extra)) return;
+      if (!confirm("¿Eliminar “" + nombre + "”? " + (LOCAL ? "Se quita del sitio." : "Se quita del sitio cuando publiques.") + extra)) return;
       lista.splice(i, 1);
       if (tabActual === "lineas") {
         ["personas", "publicaciones"].forEach(function (k) {
           state.data[k].forEach(function (x) { x.lineas = (x.lineas || []).filter(function (id) { return id !== it.id; }); });
         });
       }
-    } else if (accion === "destacar") {
-      lista[i].destacada = !lista[i].destacada;
     } else if (accion === "subir" && i > 0) {
       lista.splice(i - 1, 0, lista.splice(i, 1)[0]);
     } else if (accion === "bajar" && i < lista.length - 1) {
@@ -469,13 +475,23 @@
   function campoHtml(c, item) {
     if (!campoVisible(c, item)) return "";
     if (c.seccion) return '<h3 class="adm-sec">' + esc(c.seccion) + "</h3>";
+    if (c.paso) {
+      return '<div class="adm-step"><span class="adm-step-num">' + c.paso + "</span><div><h3>" + esc(c.titulo) + "</h3><p>" + esc(c.texto) + "</p></div></div>";
+    }
+    if (c.tipo === "vistaTarjeta") {
+      return '<div class="adm-preview"><span class="adm-preview-label">Así se va a ver la tarjeta:</span><div data-vista-tarjeta></div></div>';
+    }
     if (c.tipo === "nota") return '<p class="adm-note">' + esc(c.texto) + "</p>";
     if (c.tipo === "bloques") {
-      return '<div class="adm-field"><p class="adm-help">Armá la página con bloques. Se muestran en este orden; usá las flechas para moverlos.</p>' +
+      return '<div class="adm-field">' +
         '<div class="adm-blocks" data-bloques="' + c.k + '"></div>' +
-        '<div class="adm-add"><span>Agregar:</span>' + Object.keys(TIPOS_BLOQUE).map(function (t) {
-          return '<button type="button" class="adm-btn small" data-add-bloque="' + t + '">+ ' + esc(TIPOS_BLOQUE[t].nombre) + "</button>";
-        }).join("") + "</div></div>";
+        '<div class="adm-add"><p class="adm-add-title">Agregar un bloque a la página</p>' +
+        '<p class="adm-add-help">Tocá el tipo de bloque que quieras: se agrega al final de la página. Después podés moverlo con ↑ ↓ o quitarlo.</p>' +
+        '<div class="adm-palette">' + Object.keys(TIPOS_BLOQUE).map(function (t) {
+          var b = TIPOS_BLOQUE[t];
+          return '<button type="button" class="adm-pal" data-add-bloque="' + t + '"><span class="adm-pal-ico">' + esc(b.icono) + "</span>" +
+            "<strong>" + esc(b.nombre) + "</strong><small>" + esc(b.desc) + "</small></button>";
+        }).join("") + "</div></div></div>";
     }
     var v = item[c.k];
     var id = "f-" + c.k;
@@ -484,6 +500,21 @@
     if (c.tipo === "textarea") {
       return '<div class="adm-field"><label for="' + id + '">' + label + '</label><textarea id="' + id + '" name="' + c.k + '"' +
         (c.grande ? ' class="grande"' : "") + (c.ph ? ' placeholder="' + esc(c.ph) + '"' : "") + ">" + esc(v) + "</textarea>" + ayuda + "</div>";
+    }
+    if (c.tipo === "numero") {
+      return '<div class="adm-field"><label for="' + id + '">' + label + '</label><input type="number" min="1" max="12" step="1" id="' + id + '" name="' + c.k + '" value="' + esc(v) + '" class="adm-num">' + ayuda + "</div>";
+    }
+    if (c.tipo === "mapa") {
+      return '<div class="adm-field"><label for="' + id + '">' + label + '</label>' +
+        '<textarea id="' + id + '" name="' + c.k + '" rows="2" placeholder="Pegá acá el link o el código de Google Maps">' + esc(v) + "</textarea>" +
+        '<details class="adm-howto"><summary>¿Cómo copio el link?</summary><ol>' +
+        "<li>Buscá el lugar en <strong>Google Maps</strong>.</li>" +
+        "<li>Tocá <strong>Compartir</strong>.</li>" +
+        "<li>Lo más preciso: elegí la pestaña <strong>Insertar un mapa</strong> y tocá <strong>Copiar HTML</strong>.</li>" +
+        "<li>También sirve <strong>Copiar vínculo</strong>, o copiar la dirección de la barra del navegador.</li>" +
+        "<li>Pegalo en este campo. Abajo vas a ver cómo queda el mapa.</li></ol></details>" +
+        '<p class="adm-map-status" data-map-status></p>' +
+        '<iframe class="adm-map-preview" data-map-preview title="Vista previa del mapa" loading="lazy"></iframe></div>';
     }
     if (c.tipo === "check") {
       return '<div class="adm-field"><div class="adm-checks"><label><input type="checkbox" name="' + c.k + '"' + (v ? " checked" : "") + "> " +
@@ -531,6 +562,7 @@
       var el = form.elements[c.k];
       if (!el) return;
       if (c.tipo === "check") { item[c.k] = el.checked; return; }
+      if (c.tipo === "numero") { var n = parseInt(el.value, 10); item[c.k] = n > 0 ? Math.min(n, 12) : 1; return; }
       var val = String(el.value || "").trim();
       if (c.tipo === "url" && val && /^(javascript|data|vbscript):/i.test(val)) val = "";
       if (c.tipo === "url" && val && /^www\./i.test(val)) val = "https://" + val;
@@ -546,7 +578,6 @@
   function abrirEditor(tab, index) {
     var sec = SECCIONES[tab];
     var item = index >= 0 ? clone(state.data[tab][index]) : { id: nuevoId() };
-    if (sec.destacable && index < 0) item.destacada = false;
     edicion = { tab: tab, index: index, item: item };
     $("#editor-titulo").textContent = (index >= 0 ? "Editar " : "Agregar ") + sec.singular;
     $("#editor-campos").innerHTML = camposHtml(sec.campos, item);
@@ -556,6 +587,7 @@
       if (c.tipo === "imagen") prepararImagen(c);
       if (c.tipo === "bloques") prepararBloques(c);
     });
+    prepararVistaTarjeta(sec);
 
     var dlg = $("#editor");
     dlg.classList.toggle("wide", !!sec.ancho);
@@ -576,7 +608,8 @@
       quitar.hidden = !hidden.value;
     }
     pintar();
-    quitar.addEventListener("click", function () { hidden.value = ""; pintar(); });
+    function avisar() { $("#editor-form").dispatchEvent(new Event("input")); }
+    quitar.addEventListener("click", function () { hidden.value = ""; pintar(); avisar(); });
     box.querySelector("[data-file]").addEventListener("change", function (ev) {
       var file = ev.target.files && ev.target.files[0];
       if (!file) return;
@@ -584,6 +617,7 @@
         hidden.value = path;
         edicion.item[c.k + "__pendiente"] = path; // para que no se descarte antes de guardar
         pintar();
+        avisar();
       });
       ev.target.value = "";
     });
@@ -602,6 +636,27 @@
       alert("No se pudo leer esa imagen. Probá con un JPG o PNG.");
       throw e;
     });
+  }
+
+  /* ---------- Vista previa de la tarjeta (paso 1), se actualiza mientras se escribe ---------- */
+  function prepararVistaTarjeta(sec) {
+    var box = document.querySelector("[data-vista-tarjeta]");
+    var form = $("#editor-form");
+    form.oninput = null;
+    if (!box || !sec.tarjeta) return;
+    var t = sec.tarjeta;
+    function val(k) { var el = form.elements[k]; return el ? String(el.value || "").trim() : ""; }
+    function pintar() {
+      var foto = urlImagen(val(t.img));
+      box.innerHTML = '<div class="pv-card">' +
+        (foto ? '<div class="pv-img"><img src="' + esc(foto) + '" alt=""></div>' : '<div class="pv-img pv-empty">Sin imagen</div>') +
+        '<div class="pv-body">' + (t.fecha && val(t.fecha) ? "<time>" + esc(val(t.fecha)) + "</time>" : "") +
+        "<h4>" + esc(val(t.titulo) || "Título") + "</h4>" +
+        "<p>" + esc(val(t.texto) || "Descripción…") + "</p>" +
+        '<span class="pv-more">' + esc(t.mas || "Conocé más →") + "</span></div></div>";
+    }
+    form.oninput = function (ev) { if (!ev.target.hasAttribute("data-b")) pintar(); };
+    pintar();
   }
 
   /* ---------- Editor de bloques (contenido de la página) ---------- */
@@ -629,14 +684,16 @@
 
     function pintar() {
       if (!lista.length) {
-        cont.innerHTML = '<p class="adm-empty">La página todavía no tiene contenido. Agregá bloques con los botones de abajo.</p>';
+        cont.innerHTML = '<div class="adm-empty-page"><p><strong>La página todavía está vacía.</strong> Podés empezar con un modelo ' +
+          "(un título, un texto y una imagen, listos para completar) o agregar bloques uno por uno con los botones de abajo.</p>" +
+          '<button type="button" class="adm-btn primary small" data-modelo>Empezar con un modelo</button></div>';
         return;
       }
       cont.innerHTML = lista.map(function (b, i) {
         var t = TIPOS_BLOQUE[b.tipo];
         if (!t) return "";
         return '<div class="adm-block">' +
-          '<div class="adm-block-head"><strong>' + esc(t.nombre) + "</strong>" +
+          '<div class="adm-block-head"><strong><span class="adm-pal-ico">' + esc(t.icono) + "</span> " + (i + 1) + ". " + esc(t.nombre) + "</strong>" +
           '<span class="adm-actions">' +
           '<button type="button" class="adm-btn small ghost" data-b-mover="-1" data-b-i="' + i + '" aria-label="Subir bloque"' + (i === 0 ? " disabled" : "") + ">↑</button>" +
           '<button type="button" class="adm-btn small ghost" data-b-mover="1" data-b-i="' + i + '" aria-label="Bajar bloque"' + (i === lista.length - 1 ? " disabled" : "") + ">↓</button>" +
@@ -669,6 +726,13 @@
       });
     });
     cont.addEventListener("click", function (ev) {
+      if (ev.target.closest("[data-modelo]")) {
+        lista.push({ tipo: "titulo" }, { tipo: "parrafo" }, { tipo: "imagen" });
+        pintar();
+        var campo = cont.querySelector("input[type=text], textarea");
+        if (campo) campo.focus();
+        return;
+      }
       var mover = ev.target.closest("[data-b-mover]");
       var borrar = ev.target.closest("[data-b-borrar]");
       if (mover) {
@@ -742,8 +806,9 @@
       return;
     }
     Object.keys(item).forEach(function (k) { if (/__pendiente$/.test(k)) delete item[k]; });
-    if (sec.destacable && edicion.index < 0) item.id = idUnico(state.data[edicion.tab], item.nombre_es || item.titulo_es, item);
+    if (sec.conPagina && edicion.index < 0) item.id = idUnico(state.data[edicion.tab], item.nombre_es || item.titulo_es, item);
     if (edicion.index >= 0) state.data[edicion.tab][edicion.index] = item;
+    else if (sec.nuevasArriba) state.data[edicion.tab].unshift(item);
     else state.data[edicion.tab].push(item);
     $("#editor").close();
     edicion = null;
@@ -766,11 +831,30 @@
       '<div class="adm-toolbar"><h2>' + esc(o.titulo) + "</h2></div>" +
       '<p class="adm-help">' + esc(o.ayuda) + (o.donde ? " " + dondeHtml(o.donde) : "") + "</p>" +
       camposHtml(o.campos, obj) +
-      '<p class="adm-help">Los cambios se guardan solos como borrador. Tocá “Publicar” para que se vean en el sitio.</p></form>';
+      '<p class="adm-help">' + (LOCAL ? "Los cambios se guardan solos (solo en este navegador)." : "Los cambios se guardan solos como borrador. Tocá “Publicar” para que se vean en el sitio.") + "</p></form>";
     var form = $("#obj-form");
-    function guardar() { leerCampos(form, o.campos, obj); guardarBorrador(); }
+    function guardar() { leerCampos(form, o.campos, obj); guardarBorrador(); actualizarMapa(); }
+    function actualizarMapa() {
+      var prev = form.querySelector("[data-map-preview]");
+      if (!prev || !window.SITE_MAPA) return;
+      var info = window.SITE_MAPA(obj);
+      var msg = {
+        "": "Sin link: el mapa se arma con la dirección escrita.",
+        insertar: "✓ Código de “Insertar un mapa” reconocido: el mapa muestra exactamente ese lugar.",
+        link: "✓ Link de Google Maps reconocido.",
+        corto: "⚠ Es un link corto (maps.app.goo.gl). Sirve para el botón “Ver en Google Maps”, pero el mapa de la página se arma con la dirección escrita. Para que muestre el lugar exacto, usá “Insertar un mapa → Copiar HTML”.",
+        desconocido: "⚠ Es un link de Google Maps pero no indica un lugar. Copiá el link con el lugar seleccionado, o usá “Insertar un mapa”.",
+        invalido: "⚠ Eso no parece un link de Google Maps. Revisá lo que pegaste."
+      }[info.estado];
+      var st = form.querySelector("[data-map-status]");
+      st.textContent = msg;
+      st.className = "adm-map-status " + (info.estado === "insertar" || info.estado === "link" ? "ok" : info.estado ? "warn" : "");
+      if (info.embed && prev.getAttribute("src") !== info.embed) prev.setAttribute("src", info.embed);
+      prev.hidden = !info.embed;
+    }
     form.addEventListener("input", guardar);
     form.addEventListener("change", guardar);
+    actualizarMapa();
   }
 
   /* ---------- GitHub ---------- */
@@ -1033,7 +1117,16 @@
       $("#nota-local").hidden = false;
       var tabGh = document.querySelector('#tabs [data-tab="publicacion"]');
       if (tabGh) tabGh.hidden = true;
+    } else {
+      document.querySelector("[data-guia-local]").hidden = true;
+      document.querySelector("[data-guia-github]").hidden = false;
     }
+    // La guía queda abierta la primera vez; después recuerda si la cerraste
+    var guia = $("#guia");
+    try { guia.open = localStorage.getItem("nn-admin-guia") !== "cerrada"; } catch (e) { guia.open = true; }
+    guia.addEventListener("toggle", function () {
+      try { localStorage.setItem("nn-admin-guia", guia.open ? "abierta" : "cerrada"); } catch (e) { /* nada */ }
+    });
     $("#btn-preview").addEventListener("click", function () {
       guardarBorrador();
       window.open(LOCAL ? "index.html" : "index.html?vista-previa", "_blank");
@@ -1052,7 +1145,7 @@
 
     var inicial = (location.hash || "").slice(1);
     var validas = Object.keys(SECCIONES).concat(Object.keys(OBJETOS), ["publicacion"]);
-    mostrarTab(validas.indexOf(inicial) !== -1 ? inicial : "marcos");
+    mostrarTab(validas.indexOf(inicial) !== -1 ? inicial : "noticias");
   }
 
   if (!window.SITE_DATA || !normalizar) {

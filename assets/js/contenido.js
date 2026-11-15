@@ -16,17 +16,17 @@
 
   /* ---------- Valores por defecto (si data/contenido.js no los trae) ---------- */
   var DEFAULT_LINEAS = [
-    { id: "ultrasonidos", destacada: true, imagen: "assets/img/linea-ultrasonidos.jpg",
+    { id: "ultrasonidos", imagen: "assets/img/linea-ultrasonidos.jpg",
       titulo_es: "Vocalizaciones ultrasónicas y dinámica de la memoria", titulo_en: "Ultrasonic Vocalizations and Memory Dynamics",
       corto_es: "Ultrasonidos", corto_en: "Ultrasonics",
       resumen_es: "Las ratas se comunican con sonidos por encima de lo que el oído humano puede percibir. Estudiamos qué nos dicen esas vocalizaciones sobre cómo se forman, se evocan y se transforman las memorias.",
       resumen_en: "Rats communicate with sounds above the range of human hearing. We study what these vocalizations reveal about how memories are formed, retrieved, and transformed." },
-    { id: "desorientacion", destacada: true, imagen: "assets/img/linea-desorientacion.jpg",
+    { id: "desorientacion", imagen: "assets/img/linea-desorientacion.jpg",
       titulo_es: "Desorientación espacial e integración de trayectoria", titulo_en: "Spatial Disorientation and Path Integration",
       corto_es: "Desorientación", corto_en: "Disorientation",
       resumen_es: "Cómo el cerebro estima la propia posición a partir del movimiento y qué ocurre cuando esas señales internas entran en conflicto, como en el vuelo.",
       resumen_en: "How the brain estimates its own position from self-motion, and what happens when those internal signals conflict, as in flight." },
-    { id: "navegacion", destacada: true, imagen: "assets/img/linea-navegacion.jpg",
+    { id: "navegacion", imagen: "assets/img/linea-navegacion.jpg",
       titulo_es: "Ecología del movimiento y eficiencia de navegación", titulo_en: "Movement Ecology and Navigation Efficiency",
       corto_es: "Navegación", corto_en: "Navigation",
       resumen_es: "Trayectorias, decisiones y estrategias: cómo los animales exploran y aprenden a moverse de forma eficiente en entornos complejos.",
@@ -44,7 +44,8 @@
     ciudad_es: "Ciudad de Buenos Aires, Argentina",
     ciudad_en: "Buenos Aires, Argentina",
     mapa: "Iguazú 341, Buenos Aires, Argentina",
-    cursosUrl: "https://investigacion.itba.edu.ar/cursos-de-doctorado/"
+    cursosUrl: "https://investigacion.itba.edu.ar/cursos-de-doctorado/",
+    mapaLink: ""
   };
 
   var LISTAS = ["marcos", "lineas", "personas", "publicaciones", "subsidios", "noticias", "galeria"];
@@ -56,6 +57,9 @@
     d = d ? copia(d) : {};
     d.ajustes = d.ajustes || {};
     if (d.ajustes.mostrarAvisosEjemplo === undefined) d.ajustes.mostrarAvisosEjemplo = true;
+    // Cuántas noticias y líneas se muestran en la portada (las primeras de cada lista)
+    d.ajustes.portadaNoticias = limiteValido(d.ajustes.portadaNoticias, 1);
+    d.ajustes.portadaLineas = limiteValido(d.ajustes.portadaLineas, 3);
     if (!d.contacto) {
       d.contacto = copia(DEFAULT_CONTACTO);
       d.contacto.email = d.ajustes.email || "";
@@ -72,7 +76,14 @@
     });
     d.marcos.forEach(function (m) {
       if (!Array.isArray(m.contenido)) m.contenido = [];
-      if (m.destacada === undefined) m.destacada = true;
+      delete m.destacada; // en la portada va solo el primero de la lista
+      // Versiones anteriores tenían varios títulos y textos: quedan un título y una descripción
+      if (!m.titulo_es) { m.titulo_es = m.nombre_es || ""; m.titulo_en = m.nombre_en || ""; }
+      if (m.descripcion_es === undefined) {
+        m.descripcion_es = m.cita_es || m.tarjeta_es || m.bajada_es || "";
+        m.descripcion_en = m.cita_en || m.tarjeta_en || m.bajada_en || "";
+      }
+      ["nombre", "bajada", "cita", "tarjeta", "boton"].forEach(function (k) { delete m[k + "_es"]; delete m[k + "_en"]; });
     });
 
     d.lineas.forEach(function (l) {
@@ -80,10 +91,10 @@
         l.contenido = l.descripcion_es ? [{ tipo: "parrafo", texto_es: l.descripcion_es, texto_en: l.descripcion_en || "" }] : [];
       }
       delete l.pagina; delete l.descripcion_es; delete l.descripcion_en;
-      if (l.destacada === undefined) l.destacada = true;
+      delete l.destacada; // en la portada van las primeras de la lista
     });
     d.noticias.forEach(function (n, i) {
-      if (n.destacada === undefined) n.destacada = i === 0;
+      delete n.destacada; // en la portada van las primeras de la lista
       if (n.imagen === undefined) n.imagen = "";
       if (!Array.isArray(n.contenido)) {
         n.contenido = [];
@@ -92,6 +103,50 @@
       delete n.enlace;
     });
     return d;
+  }
+
+  function limiteValido(n, porDefecto) {
+    n = parseInt(n, 10);
+    return n > 0 ? Math.min(n, 12) : porDefecto;
+  }
+
+  // Lo que va en la portada: los primeros elementos de la lista, según el límite de Ajustes
+  function enPortada(d, k) {
+    var limite = k === "marcos" ? 1 : k === "noticias" ? d.ajustes.portadaNoticias : d.ajustes.portadaLineas;
+    return d[k].slice(0, limite);
+  }
+
+  /* ---------- Mapa: entiende links de Google Maps pegados desde el panel ----------
+     Acepta: el código "Insertar un mapa" (<iframe ...>), un link de google.com/maps (de un lugar,
+     una búsqueda o coordenadas) o un link corto maps.app.goo.gl. Los links cortos no se pueden
+     leer desde el navegador: sirven para el botón "Ver en Google Maps", y el mapa se arma con la dirección. */
+  function mapaInfo(c) {
+    var raw = String(c.mapaLink || "").trim();
+    var tag = raw.match(/<iframe[^>]+src=["']([^"']+)["']/i);
+    var url = (tag ? tag[1] : raw).replace(/&amp;/g, "&");
+    var embed = "", abrir = "", estado = url ? "invalido" : "";
+    if (/^https:\/\/(www\.)?google\.[a-z.]+\/maps\/embed\?/i.test(url)) {
+      embed = url; estado = "insertar";
+    } else if (/^https:\/\/(maps\.app\.goo\.gl|goo\.gl\/maps)\//i.test(url)) {
+      abrir = url; estado = "corto";
+    } else if (/^https:\/\/((www|maps)\.)?google\.[a-z.]+\/maps/i.test(url) || /^https:\/\/maps\.google\.[a-z.]+\//i.test(url)) {
+      abrir = url;
+      var lugar = url.match(/\/maps\/place\/([^/@?]+)/);
+      var param = url.match(/[?&](?:q|query)=([^&#]+)/);
+      var coords = url.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
+      var q = "";
+      try {
+        q = lugar ? decodeURIComponent(lugar[1].replace(/\+/g, " "))
+          : param ? decodeURIComponent(param[1].replace(/\+/g, " "))
+          : coords ? coords[1] + "," + coords[2] : "";
+      } catch (e) { q = ""; }
+      if (q) { embed = "https://www.google.com/maps?q=" + encodeURIComponent(q) + "&output=embed"; estado = "link"; }
+      else estado = "desconocido";
+    }
+    var dir = c.mapa || [c.calle, c.ciudad_es].filter(Boolean).join(", ");
+    if (!embed && dir) embed = "https://www.google.com/maps?q=" + encodeURIComponent(dir) + "&output=embed";
+    if (!abrir && dir) abrir = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(dir);
+    return { embed: embed, abrir: abrir, estado: estado };
   }
 
   /* ---------- Utilidades ---------- */
@@ -282,21 +337,22 @@
 
   /* ---------- Bloques del HTML ---------- */
   var render = {
-    /* Marco conceptual */
+    /* Marcos conceptuales: en la portada solo el primero de la lista.
+       Cada marco tiene un título, una descripción y una imagen (cómo se ve "desde afuera")
+       y su página armada con bloques. */
     "marcos-destacados": function (d) {
-      var lista = d.marcos.filter(function (m) { return m.destacada; });
+      var lista = enPortada(d, "marcos");
       if (!lista.length) return vacio("Próximamente.", "Coming soon.");
       return lista.map(function (m) {
         var foto = img(m.imagen);
         return '<div class="marco" id="marco-' + esc(m.id) + '">' +
-          '<div class="section-head"><span class="eyebrow">' + bi("Marco conceptual", "Conceptual framework") + "</span>" +
-          "<h2>" + bi(m.titulo_es || m.nombre_es, m.titulo_en || m.nombre_en) + "</h2></div>" +
+          '<div class="section-head"><span class="eyebrow">' + bi("Marcos conceptuales", "Conceptual frameworks") + "</span>" +
+          "<h2>" + bi(m.titulo_es, m.titulo_en) + "</h2></div>" +
           '<div class="framework">' +
-          (m.cita_es ? "<blockquote>" + bi(m.cita_es, m.cita_en) + "</blockquote>" : "<div></div>") +
+          (m.descripcion_es ? "<blockquote>" + bi(m.descripcion_es, m.descripcion_en) + "</blockquote>" : "<div></div>") +
           '<a class="ribio-card" href="' + esc(marcoUrl(m)) + '">' +
-          (foto ? '<img src="' + esc(foto) + '" alt="' + esc(m.nombre_es) + '">' : "") +
-          (m.tarjeta_es ? "<p>" + bi(m.tarjeta_es, m.tarjeta_en) + "</p>" : "") +
-          '<span class="more">' + bi(m.boton_es || "Ver más →", m.boton_en || "Learn more →") + "</span></a>" +
+          (foto ? '<img src="' + esc(foto) + '" alt="' + esc(m.titulo_es) + '">' : "<p><strong>" + bi(m.titulo_es, m.titulo_en) + "</strong></p>") +
+          '<span class="more">' + bi("Conocé más →", "Learn more →") + "</span></a>" +
           "</div></div>";
       }).join("");
     },
@@ -306,37 +362,34 @@
         var foto = img(m.imagen);
         return '<a class="line-card marco-card" id="marco-' + esc(m.id) + '" href="' + esc(marcoUrl(m)) + '">' +
           '<div class="thumb">' + (foto ? '<img src="' + esc(foto) + '" alt="" loading="lazy">' : "") + "</div>" +
-          '<div class="body"><h3>' + bi(m.nombre_es, m.nombre_en) + "</h3>" +
-          "<p>" + bi(m.tarjeta_es || m.cita_es, m.tarjeta_en || m.cita_en) + "</p>" +
-          '<span class="more">' + bi("Ver más →", "Learn more →") + "</span></div></a>";
+          '<div class="body"><h3>' + bi(m.titulo_es, m.titulo_en) + "</h3>" +
+          "<p>" + bi(m.descripcion_es, m.descripcion_en) + "</p>" +
+          '<span class="more">' + bi("Conocé más →", "Learn more →") + "</span></div></a>";
       }).join("");
     },
     "marcos-mas": function (d) {
-      var dest = d.marcos.filter(function (m) { return m.destacada; }).length;
-      return d.marcos.length > dest ? boton("marcos.html", "Ver todos los marcos conceptuales", "See all conceptual frameworks") : "";
+      return d.marcos.length > 1 ? boton("marcos.html", "Ver todos los marcos conceptuales", "See all conceptual frameworks") : "";
     },
     "marcos-footer": function (d) {
       return d.marcos.map(function (m) {
-        return '<li><a href="' + esc(marcoUrl(m)) + '">' + bi(m.nombre_es, m.nombre_en) + "</a></li>";
+        return '<li><a href="' + esc(marcoUrl(m)) + '">' + bi(m.titulo_es, m.titulo_en) + "</a></li>";
       }).join("");
     },
     "marco-hero": function (d) {
       var m = porId(d.marcos, idUrl());
       if (!m) return "<h1>" + bi("Marco conceptual no encontrado", "Conceptual framework not found") + "</h1>";
-      ponerTitulo(m.nombre_es, m.nombre_en);
-      return "<h1>" + bi(m.nombre_es, m.nombre_en) + "</h1>" + (m.bajada_es ? "<p>" + bi(m.bajada_es, m.bajada_en) + "</p>" : "");
+      ponerTitulo(m.titulo_es, m.titulo_en);
+      return "<h1>" + bi(m.titulo_es, m.titulo_en) + "</h1>" + (m.descripcion_es ? "<p>" + bi(m.descripcion_es, m.descripcion_en) + "</p>" : "");
     },
     "marco-cuerpo": function (d) {
       var m = porId(d.marcos, idUrl());
       if (!m) return '<p><a href="marcos.html">' + bi("Ver todos los marcos conceptuales", "See all conceptual frameworks") + "</a></p>";
-      var html = bloquesHtml(m.contenido);
-      if (!html && m.cita_es) html = "<blockquote class=\"art-quote\">" + bi(m.cita_es, m.cita_en) + "</blockquote>";
-      return '<article class="article article-wide">' + html + "</article>";
+      return '<article class="article article-wide">' + bloquesHtml(m.contenido) + "</article>";
     },
 
     /* Líneas de investigación */
     "lineas-destacadas": function (d) {
-      var lista = d.lineas.filter(function (l) { return l.destacada; });
+      var lista = enPortada(d, "lineas");
       if (!lista.length) return vacio("Próximamente.", "Coming soon.");
       return lista.map(tarjetaLinea).join("");
     },
@@ -345,11 +398,10 @@
       return d.lineas.map(tarjetaLinea).join("");
     },
     "lineas-mas": function (d) {
-      var dest = d.lineas.filter(function (l) { return l.destacada; }).length;
-      return d.lineas.length > dest ? boton("lineas.html", "Ver todas las líneas", "See all research lines") : "";
+      return d.lineas.length > enPortada(d, "lineas").length ? boton("lineas.html", "Ver todas las líneas", "See all research lines") : "";
     },
     "lineas-footer": function (d) {
-      var lista = d.lineas.filter(function (l) { return l.destacada; });
+      var lista = enPortada(d, "lineas");
       var html = lista.map(function (l) {
         return '<li><a href="' + esc(lineaUrl(l)) + '">' + bi(l.corto_es || l.titulo_es, l.corto_en || l.titulo_en) + "</a></li>";
       }).join("");
@@ -372,8 +424,8 @@
 
     /* Noticias */
     "noticias-destacadas": function (d) {
-      var lista = d.noticias.filter(function (n) { return n.destacada; });
-      if (!lista.length) return d.noticias.length ? "" : vacio("No hay noticias por ahora.", "No news yet.");
+      var lista = enPortada(d, "noticias");
+      if (!lista.length) return vacio("No hay noticias por ahora.", "No news yet.");
       return lista.map(tarjetaNoticia).join("");
     },
     noticias: function (d) {
@@ -381,8 +433,7 @@
       return d.noticias.map(tarjetaNoticia).join("");
     },
     "noticias-mas": function (d) {
-      var dest = d.noticias.filter(function (n) { return n.destacada; }).length;
-      return d.noticias.length > dest ? boton("noticias.html", "Ver todas las noticias", "See all news") : "";
+      return d.noticias.length > enPortada(d, "noticias").length ? boton("noticias.html", "Ver todas las noticias", "See all news") : "";
     },
     "noticia-hero": function (d) {
       var n = porId(d.noticias, idUrl());
@@ -458,7 +509,7 @@
       }).join("");
     },
 
-    /* Vida del lab */
+    /* Vida de laboratorio */
     galeria: function (d) {
       if (!d.galeria.length) return vacio("Próximamente.", "Coming soon.");
       return d.galeria.map(function (g) {
@@ -480,20 +531,18 @@
       var cursos = safeUrl(c.cursosUrl);
       var host = cursos.replace(/^https?:\/\//i, "").split("/")[0];
       return "<dt>" + bi("Dirección", "Address") + "</dt>" +
-        "<dd>" + direccionHtml(c, ", ") + "</dd>" +
+        "<dd>" + direccionHtml(c, ", ") +
+        (mapaInfo(c).abrir ? '<br><a href="' + esc(mapaInfo(c).abrir) + '" target="_blank" rel="noopener">' + bi("Ver en Google Maps ↗", "Open in Google Maps ↗") + "</a>" : "") +
+        "</dd>" +
         "<dt>Email</dt><dd>" + email + "</dd>" +
         (cursos ? "<dt>" + bi("Cursos de doctorado", "Doctoral courses") + '</dt><dd><a href="' + esc(cursos) + '" target="_blank" rel="noopener">' + esc(host) + "</a></dd>" : "");
     },
     direccion: function (d) { return direccionHtml(d.contacto, "<br>"); },
     mapa: function (d, el) {
-      var c = d.contacto;
-      var q = c.mapa || [c.calle, c.ciudad_es].filter(Boolean).join(", ");
-      el.hidden = !q;
-      if (q) {
-        var src = "https://www.google.com/maps?q=" + encodeURIComponent(q) + "&output=embed";
-        if (el.getAttribute("src") !== src) el.setAttribute("src", src);
-        el.setAttribute("title", "Mapa: " + q);
-      }
+      var info = mapaInfo(d.contacto);
+      el.hidden = !info.embed;
+      if (info.embed && el.getAttribute("src") !== info.embed) el.setAttribute("src", info.embed);
+      el.setAttribute("title", "Mapa");
       return null;
     },
     "cursos-link": function (d, el) {
@@ -549,7 +598,7 @@
     document.querySelectorAll("[data-aviso]").forEach(function (el) { el.hidden = !avisos; });
 
     // Modo maqueta: avisar cuando lo que se ve incluye cambios hechos en el panel
-    if (MODO_LOCAL && ctx.cambiosLocales) {
+    if (MODO_LOCAL && ctx.cambiosLocales && !document.body.classList.contains("adm")) {
       var demo = document.createElement("div");
       demo.className = "preview-bar demo-bar";
       demo.innerHTML = '<span lang="es">Estás viendo cambios de demostración hechos en el panel: son solo locales y se ven únicamente en este navegador.</span>' +
@@ -582,6 +631,7 @@
   window.SITE_NORMALIZAR = normalizar;
   window.SITE_LINEA_URL = lineaUrl;
   window.SITE_MARCO_URL = marcoUrl;
+  window.SITE_MAPA = mapaInfo;
   window.SITE_NOTICIA_URL = noticiaUrl;
   window.SITE_DRAFT_KEY = DRAFT_KEY;
   window.SITE_MODO_LOCAL = MODO_LOCAL;

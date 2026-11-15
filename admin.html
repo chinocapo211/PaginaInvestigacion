@@ -34,13 +34,13 @@
 
 <div class="container adm-layout">
   <nav class="adm-tabs" id="tabs" aria-label="Secciones">
-    <button type="button" data-tab="marcos">Marco conceptual</button>
-    <button type="button" data-tab="lineas">Líneas de investigación</button>
-    <button type="button" data-tab="personas">Personas</button>
     <button type="button" data-tab="noticias">Noticias</button>
+    <button type="button" data-tab="marcos">Marcos conceptuales</button>
+    <button type="button" data-tab="lineas">Líneas de investigación</button>
     <button type="button" data-tab="publicaciones">Publicaciones</button>
     <button type="button" data-tab="subsidios">Subsidios</button>
-    <button type="button" data-tab="galeria">Vida del lab</button>
+    <button type="button" data-tab="galeria">Vida de laboratorio</button>
+    <button type="button" data-tab="personas">Personas</button>
     <button type="button" data-tab="contacto">Contacto</button>
     <button type="button" data-tab="ajustes">Ajustes</button>
     <button type="button" data-tab="publicacion">Conexión con GitHub</button>
@@ -56,6 +56,36 @@
       <strong>Tus cambios están guardados como borrador en este navegador, pero todavía no se ven en el sitio.</strong>
       Para revisarlos usá “Vista previa”; para que los vea todo el mundo, tocá “Publicar”.
     </div>
+    <details class="adm-guide" id="guia">
+      <summary>¿Cómo funciona este panel?</summary>
+      <div class="adm-guide-body">
+        <h3>Listas y orden</h3>
+        <p>Cada sección (noticias, líneas, personas…) es una lista. El sitio muestra las cosas <strong>en el mismo orden que la lista</strong>.
+          Con las flechas <strong>↑ ↓</strong> cambiás el orden; con <strong>Editar</strong> y <strong>Eliminar</strong>, el contenido.</p>
+        <h3>Destacados: lo que sale en la portada</h3>
+        <p>En noticias, líneas de investigación y marcos conceptuales, <strong>los primeros de la lista son los destacados</strong> y son los
+          únicos que aparecen en la portada (llevan la etiqueta “★ Destacada · en la portada”). Una línea punteada marca dónde termina la portada.
+          Lo que queda debajo se ve con los botones “Ver todas las noticias”, “Ver todas las líneas” o “Ver todos los marcos conceptuales”.
+          Para destacar algo, subilo con ↑. Cuántas noticias y líneas entran en la portada se elige en <strong>Ajustes</strong>;
+          de marcos conceptuales siempre se muestra uno.</p>
+        <h3>Páginas armadas con bloques</h3>
+        <p>Cada noticia, línea y marco conceptual tiene su propia página. Se arma sumando <strong>bloques</strong> (título, subtítulo, texto,
+          imagen, lista, datos destacados, botón, texto resaltado, imagen con texto al lado) con los botones “+ …” al final del formulario.
+          Los bloques se muestran uno debajo del otro, en el orden en que están; se reordenan con sus propias flechas.</p>
+        <h3>“Aparece en”</h3>
+        <p>Debajo de cada elemento se listan los lugares del sitio donde se ve. Al tocar uno, se abre el sitio justo ahí, con el elemento resaltado.</p>
+        <h3>Español e inglés</h3>
+        <p>Casi todos los textos tienen una versión en español y otra en inglés (el botón ES / EN del sitio cambia entre ellas).
+          Si dejás vacía la versión en inglés, se muestra la de español.</p>
+        <h3>Imágenes</h3>
+        <p>Al elegir una foto, el panel la achica automáticamente para que el sitio cargue rápido. No hace falta prepararla antes.</p>
+        <h3>Dónde se guardan los cambios</h3>
+        <p data-guia-local>Por ahora el panel está en <strong>modo demostración</strong>: todo se guarda solo en este navegador y el sitio lo muestra
+          solo en esta computadora. “Volver al contenido original” borra todos los cambios.</p>
+        <p data-guia-github hidden>Los cambios se guardan como borrador en este navegador. “Vista previa” muestra el sitio con el borrador;
+          “Publicar” los sube a GitHub para que los vea todo el mundo (necesita la conexión con GitHub).</p>
+      </div>
+    </details>
     <div id="aviso" class="adm-alert" hidden></div>
     <div id="panel"></div>
   </main>

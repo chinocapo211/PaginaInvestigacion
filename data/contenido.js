@@ -1,6 +1,8 @@
 window.SITE_DATA = {
   "ajustes": {
-    "mostrarAvisosEjemplo": true
+    "mostrarAvisosEjemplo": true,
+    "portadaNoticias": 1,
+    "portadaLineas": 3
   },
   "contacto": {
     "email": "contacto@ejemplo.com",
@@ -13,25 +15,17 @@ window.SITE_DATA = {
     "ciudad_es": "Ciudad de Buenos Aires, Argentina",
     "ciudad_en": "Buenos Aires, Argentina",
     "mapa": "Iguazú 341, Buenos Aires, Argentina",
-    "cursosUrl": "https://investigacion.itba.edu.ar/cursos-de-doctorado/"
+    "cursosUrl": "https://investigacion.itba.edu.ar/cursos-de-doctorado/",
+    "mapaLink": ""
   },
   "marcos": [
     {
       "id": "ribio",
-      "destacada": true,
-      "nombre_es": "RIBio · Marco conceptual",
-      "nombre_en": "RIBio · Conceptual Framework",
-      "bajada_es": "Redes de Información Biológica · Curso de doctorado · ITBA",
-      "bajada_en": "Biological Information Networks · Doctoral course · ITBA",
       "titulo_es": "La información como código dinámico",
       "titulo_en": "Information as a dynamic code",
-      "cita_es": "La información en los seres vivos es un código dinámico que emerge de las interacciones dentro de los sistemas biológicos y entre estos y su entorno. Se transforma continuamente a través de la actividad, modificando así las condiciones para la acción posterior.",
-      "cita_en": "Information in living beings is a dynamic code that emerges from interactions within and between biological systems and their environment. It continuously transforms through activity, thereby modifying the conditions for subsequent action.",
+      "descripcion_es": "La información en los seres vivos es un código dinámico que emerge de las interacciones dentro de los sistemas biológicos y entre estos y su entorno. Se transforma continuamente a través de la actividad, modificando así las condiciones para la acción posterior.",
+      "descripcion_en": "Information in living beings is a dynamic code that emerges from interactions within and between biological systems and their environment. It continuously transforms through activity, thereby modifying the conditions for subsequent action.",
       "imagen": "assets/img/ribio-logo.png",
-      "tarjeta_es": "RIBio: curso de doctorado gratuito en ITBA que desarrolla este marco conceptual.",
-      "tarjeta_en": "RIBio: a free doctoral course at ITBA built on this conceptual framework.",
-      "boton_es": "Conocé el curso →",
-      "boton_en": "Learn about the course →",
       "contenido": [
         {
           "tipo": "imagenTexto",
@@ -85,7 +79,6 @@ window.SITE_DATA = {
   "lineas": [
     {
       "id": "ultrasonidos",
-      "destacada": true,
       "titulo_es": "Vocalizaciones ultrasónicas y dinámica de la memoria",
       "titulo_en": "Ultrasonic Vocalizations and Memory Dynamics",
       "corto_es": "Ultrasonidos",
@@ -150,7 +143,6 @@ window.SITE_DATA = {
     },
     {
       "id": "desorientacion",
-      "destacada": true,
       "titulo_es": "Desorientación espacial e integración de trayectoria",
       "titulo_en": "Spatial Disorientation and Path Integration",
       "corto_es": "Desorientación",
@@ -173,7 +165,6 @@ window.SITE_DATA = {
     },
     {
       "id": "navegacion",
-      "destacada": true,
       "titulo_es": "Ecología del movimiento y eficiencia de navegación",
       "titulo_en": "Movement Ecology and Navigation Efficiency",
       "corto_es": "Navegación",
@@ -196,7 +187,6 @@ window.SITE_DATA = {
     },
     {
       "id": "linea-de-ejemplo",
-      "destacada": false,
       "titulo_es": "Línea de investigación de ejemplo",
       "titulo_en": "Sample research line",
       "corto_es": "Ejemplo",
@@ -318,7 +308,6 @@ window.SITE_DATA = {
     {
       "id": "inscripcion-ribio",
       "fecha": "2026",
-      "destacada": true,
       "titulo_es": "Abre la inscripción a RIBio",
       "titulo_en": "RIBio enrollment is open",
       "texto_es": "Curso de doctorado gratuito sobre redes de información biológica en ITBA.",
@@ -352,7 +341,6 @@ window.SITE_DATA = {
     {
       "id": "noticia-de-ejemplo",
       "fecha": "2026",
-      "destacada": false,
       "titulo_es": "Noticia de ejemplo",
       "titulo_en": "Sample news item",
       "texto_es": "Contenido de ejemplo: esta noticia no está destacada, así que no sale en la portada pero sí en “Ver todas las noticias”.",
