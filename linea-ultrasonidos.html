@@ -13,6 +13,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/styles.css">
   <script src="assets/js/main.js"></script>
+  <script src="data/contenido.js"></script>
+  <script src="assets/js/contenido.js"></script>
 </head>
 <body>
 
@@ -198,11 +200,11 @@
       <div class="section-head">
         <h2><span lang="es">Personas en este proyecto</span><span lang="en">People in this project</span></h2>
       </div>
-      <p class="placeholder-note">
+      <p class="placeholder-note" data-aviso>
         <span lang="es">Contenido de ejemplo: completar con las personas que participan en esta línea.</span>
         <span lang="en">Sample content: fill in with the people working on this line.</span>
       </p>
-      <div class="people">
+      <div class="people" data-render="personas" data-linea="ultrasonidos">
         <article class="person">
           <div class="avatar">NN</div>
           <h3>Nombre Apellido</h3>
@@ -224,7 +226,7 @@
       <div class="section-head">
         <h2><span lang="es">Publicaciones</span><span lang="en">Publications</span></h2>
       </div>
-      <ul class="pub-list">
+      <ul class="pub-list" data-render="publicaciones" data-linea="ultrasonidos">
         <li>
           <span class="pub-year">2026</span>
           <span class="pub-authors">Apellido A, Apellido B.</span>
@@ -265,7 +267,7 @@
         </ul>
       </div>
     </div>
-    <div class="footer-bottom">© <span data-year>2026</span> <span lang="es">Laboratorio de Navegación &amp; Neurocognición</span><span lang="en">Navigation &amp; Neurocognition Laboratory</span></div>
+    <div class="footer-bottom">© <span data-year>2026</span> <span lang="es">Laboratorio de Navegación &amp; Neurocognición</span><span lang="en">Navigation &amp; Neurocognition Laboratory</span> · <a class="admin-link" href="admin.html">Admin</a></div>
   </div>
 </footer>
 
