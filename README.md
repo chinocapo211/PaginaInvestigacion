@@ -63,4 +63,11 @@ Para probarlo en la computadora conviene usar un servidor local (`python -m http
 
 ## Contenido fijo
 
-Los textos de las páginas (marco conceptual, RIBio, descripciones de cada línea) siguen escritos en el HTML.
+Lo único que sigue escrito en el HTML es el encabezado de la portada (título, lema y texto del laboratorio)
+y los títulos de cada sección. Todo lo demás se edita desde el panel.
+
+## Al subir cambios de código (caché)
+
+Los CSS y JS se cargan con `?v=20261115b` al final. Si cambiás algún archivo de `assets/` o `data/`,
+cambiá ese número en todos los `.html` (por ejemplo, por la fecha del día) para que los navegadores
+no sigan usando la versión vieja guardada.

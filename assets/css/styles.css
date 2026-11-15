@@ -113,14 +113,17 @@ html[data-lang="en"] body [lang="es"] { display: none !important; }
 .hero {
   position: relative; overflow: hidden;
   background: var(--navy); color: #fff;
-  padding: 120px 0 190px;
+  /* Los dibujos animados crecen en pantallas anchas: el espacio arriba y abajo crece con ellos */
+  padding: max(120px, calc(100vw * 110 / 1200 + 10px)) 0 max(190px, calc(100vw * 170 / 1200 + 20px));
 }
 .hero::after {
   content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 4px; background: var(--grad);
 }
 .hero-moves { position: absolute; left: 0; width: 100%; pointer-events: none; }
-.hero-moves-top { top: 0; height: 110px; }
-.hero-moves-bottom { bottom: 4px; height: 170px; }
+/* La altura acompaña al ancho (proporción del dibujo, 1200 de ancho) para que nunca se recorte
+   arriba ni abajo: así no se le corta la cabeza a la persona ni las alas al avión */
+.hero-moves-top { top: 0; height: max(110px, calc(100vw * 110 / 1200)); }
+.hero-moves-bottom { bottom: 4px; height: max(170px, calc(100vw * 170 / 1200)); }
 .hero-moves .track { fill: none; stroke-width: 1.6; stroke-linecap: round; opacity: .35; }
 .hero-moves .track.rat { stroke: #1fd6b0; stroke-dasharray: 1 6; stroke-width: 2.2; }
 .hero-moves .track.plane { stroke: #1aa7e8; stroke-dasharray: 10 8; }

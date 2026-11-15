@@ -389,7 +389,7 @@
     else if (OBJETOS[tab]) renderObjeto(tab);
     else if (tab === "ayuda") renderAyuda();
     else renderPublicacion();
-    try { history.replaceState(null, "", "#" + tab); } catch (e) { /* file:// */ }
+    try { history.replaceState(null, "", location.pathname); } catch (e) { /* file:// */ }
   }
 
   function urlImagen(path) {
@@ -1141,9 +1141,8 @@
       mostrarTab(tabActual);
     });
 
-    var inicial = (location.hash || "").slice(1);
-    var validas = Object.keys(SECCIONES).concat(Object.keys(OBJETOS), ["publicacion", "ayuda"]);
-    mostrarTab(validas.indexOf(inicial) !== -1 ? inicial : "ayuda");
+    // Al entrar al panel siempre se muestra primero "Cómo funciona"
+    mostrarTab("ayuda");
   }
 
   if (!window.SITE_DATA || !normalizar) {
