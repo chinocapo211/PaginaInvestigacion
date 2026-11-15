@@ -48,7 +48,7 @@
     marcos: {
       titulo: "Marcos conceptuales", singular: "marco conceptual", conPagina: true, ancho: true,
       limite: function () { return 1; }, enPortadaTexto: "el marco conceptual de la portada",
-      ayuda: "Cada marco conceptual tiene su propia página. El primero de la lista es el destacado: es el único que aparece en la portada. Los demás se ven con el botón “Ver todos los marcos conceptuales”. Usá las flechas para elegir cuál va primero.",
+      ayuda: "El primero de la lista es el que aparece en la portada. Para cambiarlo, usá las flechas ↑ ↓.",
       campos: [
         { paso: 1, titulo: "Cómo se ve desde afuera",
           texto: "Es la tarjeta que presenta al marco conceptual: aparece en la portada (si este marco está primero en la lista) y en “Ver todos los marcos conceptuales”. Solo lleva una imagen, un título y una descripción corta." },
@@ -63,7 +63,7 @@
         ] },
         { tipo: "vistaTarjeta" },
         { paso: 2, titulo: "Cómo se ve la página",
-          texto: "Es lo que se abre al hacer clic en la tarjeta. Arriba de todo ya aparecen el título y la descripción de arriba; debajo va lo que armes acá, sumando bloques uno debajo del otro." },
+          texto: "Es lo que se abre al hacer clic en la tarjeta. Arriba aparece el título; debajo, lo que armes acá sumando bloques. La descripción no se repite en la página." },
         { k: "contenido", tipo: "bloques", carpeta: "marcos" }
       ],
       tarjeta: { img: "imagen", titulo: "titulo_es", texto: "descripcion_es" },
@@ -80,7 +80,7 @@
     lineas: {
       titulo: "Líneas de investigación", singular: "línea", conPagina: true, ancho: true,
       limite: function (d) { return d.ajustes.portadaLineas; }, enPortadaTexto: "las líneas de la portada",
-      ayuda: "Cada línea tiene su propia página. Las primeras de la lista son las destacadas y aparecen en la portada (cuántas, se elige en Ajustes). Las demás se ven con el botón “Ver todas las líneas”. Usá las flechas ↑ ↓ para elegir el orden.",
+      ayuda: "Las primeras de la lista aparecen en la portada (cuántas, se elige en Ajustes).",
       campos: [
         { paso: 1, titulo: "Cómo se ve desde afuera",
           texto: "Es la tarjeta de la línea: aparece en la portada (si está entre las primeras de la lista) y en “Ver todas las líneas”." },
@@ -93,13 +93,13 @@
           { k: "corto_en", label: "Nombre corto (inglés)", ph: "Ultrasonics" }
         ] },
         { fila: [
-          { k: "resumen_es", label: "Resumen (español)", tipo: "textarea", req: true, ayuda: "Texto corto de la tarjeta. También aparece arriba de todo en la página de la línea." },
+          { k: "resumen_es", label: "Resumen (español)", tipo: "textarea", req: true, ayuda: "Texto corto de la tarjeta." },
           { k: "resumen_en", label: "Resumen (inglés)", tipo: "textarea" }
         ] },
         { k: "imagen", label: "Imagen de portada", tipo: "imagen", carpeta: "lineas", max: 1600, cuadrada: false, ayuda: "Aparece en la tarjeta y arriba de la página." },
         { tipo: "vistaTarjeta" },
         { paso: 2, titulo: "Cómo se ve la página",
-          texto: "Es lo que se abre al hacer clic en la tarjeta. Arriba aparecen el título y el resumen; debajo va lo que armes acá con bloques. Las personas y publicaciones de la línea se agregan solas al final." },
+          texto: "Es lo que se abre al hacer clic en la tarjeta. Arriba aparece el título; debajo, lo que armes acá con bloques. El resumen no se repite en la página. Las personas y publicaciones de la línea se agregan solas al final." },
         { k: "contenido", tipo: "bloques", carpeta: "lineas" }
       ],
       tarjeta: { img: "imagen", titulo: "titulo_es", texto: "resumen_es", mas: "Ver proyecto →" },
@@ -115,7 +115,7 @@
     },
     personas: {
       titulo: "Personas", singular: "persona",
-      ayuda: "Integrantes del laboratorio. Todas aparecen en la sección Personas de la portada, en este orden. Además, cada persona aparece en la página de las líneas de investigación que le marques.",
+      ayuda: "Aparecen en la sección Personas de la portada y en la página de las líneas que tengan marcadas.",
       campos: [
         { k: "nombre", label: "Nombre y apellido", req: true },
         { fila: [
@@ -135,7 +135,7 @@
     noticias: {
       titulo: "Noticias", singular: "noticia", conPagina: true, ancho: true, nuevasArriba: true,
       limite: function (d) { return d.ajustes.portadaNoticias; }, enPortadaTexto: "las noticias de la portada",
-      ayuda: "Cada noticia tiene su propia página. Las primeras de la lista son las destacadas y aparecen en la portada (cuántas, se elige en Ajustes). Las demás se ven con el botón “Ver todas las noticias”. Las noticias nuevas se agregan arriba de todo; usá las flechas ↑ ↓ para cambiar el orden.",
+      ayuda: "Las primeras de la lista aparecen en la portada (cuántas, se elige en Ajustes). Las nuevas se agregan arriba.",
       campos: [
         { paso: 1, titulo: "Cómo se ve desde afuera",
           texto: "Es la tarjeta de la noticia: aparece en la portada (si está entre las primeras de la lista) y en “Ver todas las noticias”." },
@@ -145,13 +145,13 @@
           { k: "titulo_en", label: "Título (inglés)", ayuda: "Si queda vacío, se usa el título en español." }
         ] },
         { fila: [
-          { k: "texto_es", label: "Resumen (español)", tipo: "textarea", ayuda: "Texto corto de la tarjeta. También aparece arriba de todo en la página de la noticia." },
+          { k: "texto_es", label: "Resumen (español)", tipo: "textarea", ayuda: "Texto corto de la tarjeta." },
           { k: "texto_en", label: "Resumen (inglés)", tipo: "textarea" }
         ] },
         { k: "imagen", label: "Imagen de portada (opcional)", tipo: "imagen", carpeta: "noticias", max: 1600, cuadrada: false, ayuda: "Aparece en la tarjeta y arriba de la página." },
         { tipo: "vistaTarjeta" },
         { paso: 2, titulo: "Cómo se ve la página",
-          texto: "Es lo que se abre al hacer clic en la tarjeta. Arriba aparecen la fecha, el título y el resumen; debajo va lo que armes acá con bloques." },
+          texto: "Es lo que se abre al hacer clic en la tarjeta. Arriba aparecen la fecha y el título; debajo, lo que armes acá con bloques. El resumen no se repite en la página." },
         { k: "contenido", tipo: "bloques", carpeta: "noticias" }
       ],
       tarjeta: { img: "imagen", titulo: "titulo_es", texto: "texto_es", fecha: "fecha", mas: "Leer más →" },
@@ -167,7 +167,7 @@
     },
     publicaciones: {
       titulo: "Publicaciones", singular: "publicación",
-      ayuda: "En el sitio se ordenan solas por año, de la más nueva a la más vieja. Marcá las líneas para que también aparezcan en la página de cada proyecto.",
+      ayuda: "En el sitio se ordenan solas por año. También aparecen en la página de las líneas que tengan marcadas.",
       campos: [
         { fila: [
           { k: "anio", label: "Año", ph: "2026", req: true },
@@ -185,7 +185,7 @@
     },
     subsidios: {
       titulo: "Subsidios", singular: "subsidio",
-      ayuda: "Todos los subsidios aparecen en la sección Subsidios de la portada, en el orden de esta lista.",
+      ayuda: "Aparecen en la sección Subsidios de la portada, en este orden.",
       campos: [
         { fila: [
           { k: "periodo", label: "Período", ph: "2025 – 2028", req: true },
@@ -199,7 +199,7 @@
     },
     galeria: {
       titulo: "Vida de laboratorio", singular: "foto",
-      ayuda: "Galería de la sección Vida de laboratorio de la portada, en el orden de esta lista. Si una tarjeta no tiene foto, se muestra un recuadro gris con la descripción.",
+      ayuda: "Fotos de la sección Vida de laboratorio de la portada, en este orden.",
       campos: [
         { k: "foto", label: "Foto", tipo: "imagen", carpeta: "vida-del-lab", max: 1400, cuadrada: false },
         { k: "texto_es", label: "Descripción (español)", req: true },
@@ -263,7 +263,7 @@
 
   /* ---------- Estado ---------- */
   var state = { data: null, base: "", imagenes: {} };
-  var tabActual = "noticias";
+  var tabActual = "ayuda";
   var $ = function (sel) { return document.querySelector(sel); };
 
   function clone(o) { return JSON.parse(JSON.stringify(o)); }
@@ -373,6 +373,13 @@
   }
 
   /* ---------- Pestañas ---------- */
+  // "Cómo funciona": la guía completa del panel (su texto está en admin.html, en <template id="tpl-ayuda">)
+  function renderAyuda() {
+    $("#panel").innerHTML = '<div class="adm-card adm-guide-page">' + $("#tpl-ayuda").innerHTML + "</div>";
+    $("#panel [data-guia-local]").hidden = !LOCAL;
+    $("#panel [data-guia-github]").hidden = LOCAL;
+  }
+
   function mostrarTab(tab) {
     tabActual = tab;
     document.querySelectorAll("#tabs [data-tab]").forEach(function (b) {
@@ -380,6 +387,7 @@
     });
     if (SECCIONES[tab]) renderLista(tab);
     else if (OBJETOS[tab]) renderObjeto(tab);
+    else if (tab === "ayuda") renderAyuda();
     else renderPublicacion();
     try { history.replaceState(null, "", "#" + tab); } catch (e) { /* file:// */ }
   }
@@ -1114,19 +1122,9 @@
       $("#btn-publicar").hidden = true;
       $("#btn-preview").textContent = "Ver sitio ↗";
       $("#btn-descartar").textContent = "Volver al contenido original";
-      $("#nota-local").hidden = false;
       var tabGh = document.querySelector('#tabs [data-tab="publicacion"]');
       if (tabGh) tabGh.hidden = true;
-    } else {
-      document.querySelector("[data-guia-local]").hidden = true;
-      document.querySelector("[data-guia-github]").hidden = false;
     }
-    // La guía queda abierta la primera vez; después recuerda si la cerraste
-    var guia = $("#guia");
-    try { guia.open = localStorage.getItem("nn-admin-guia") !== "cerrada"; } catch (e) { guia.open = true; }
-    guia.addEventListener("toggle", function () {
-      try { localStorage.setItem("nn-admin-guia", guia.open ? "abierta" : "cerrada"); } catch (e) { /* nada */ }
-    });
     $("#btn-preview").addEventListener("click", function () {
       guardarBorrador();
       window.open(LOCAL ? "index.html" : "index.html?vista-previa", "_blank");
@@ -1144,8 +1142,8 @@
     });
 
     var inicial = (location.hash || "").slice(1);
-    var validas = Object.keys(SECCIONES).concat(Object.keys(OBJETOS), ["publicacion"]);
-    mostrarTab(validas.indexOf(inicial) !== -1 ? inicial : "noticias");
+    var validas = Object.keys(SECCIONES).concat(Object.keys(OBJETOS), ["publicacion", "ayuda"]);
+    mostrarTab(validas.indexOf(inicial) !== -1 ? inicial : "ayuda");
   }
 
   if (!window.SITE_DATA || !normalizar) {

@@ -309,7 +309,6 @@
   function articulo(item) {
     var portada = img(item.imagen);
     var cuerpo = bloquesHtml(item.contenido);
-    if (!cuerpo && !portada) cuerpo = "<p>" + bi(item.resumen_es || item.texto_es, item.resumen_en || item.texto_en) + "</p>";
     return '<article class="article">' +
       (portada ? '<img class="art-cover" src="' + esc(portada) + '" alt="">' : "") +
       cuerpo + "</article>";
@@ -379,7 +378,7 @@
       var m = porId(d.marcos, idUrl());
       if (!m) return "<h1>" + bi("Marco conceptual no encontrado", "Conceptual framework not found") + "</h1>";
       ponerTitulo(m.titulo_es, m.titulo_en);
-      return "<h1>" + bi(m.titulo_es, m.titulo_en) + "</h1>" + (m.descripcion_es ? "<p>" + bi(m.descripcion_es, m.descripcion_en) + "</p>" : "");
+      return "<h1>" + bi(m.titulo_es, m.titulo_en) + "</h1>"; // la descripción es solo para la tarjeta
     },
     "marco-cuerpo": function (d) {
       var m = porId(d.marcos, idUrl());
@@ -414,7 +413,7 @@
       var l = porId(d.lineas, idUrl());
       if (!l) return "<h1>" + bi("Línea no encontrada", "Research line not found") + "</h1>";
       ponerTitulo(l.titulo_es, l.titulo_en);
-      return "<h1>" + bi(l.titulo_es, l.titulo_en) + "</h1><p>" + bi(l.resumen_es, l.resumen_en) + "</p>";
+      return "<h1>" + bi(l.titulo_es, l.titulo_en) + "</h1>"; // el resumen es solo para la tarjeta
     },
     "linea-cuerpo": function (d) {
       var l = porId(d.lineas, idUrl());
@@ -440,7 +439,7 @@
       if (!n) return "<h1>" + bi("Noticia no encontrada", "News item not found") + "</h1>";
       ponerTitulo(n.titulo_es, n.titulo_en);
       return '<time class="hero-date" datetime="' + esc(n.fecha) + '">' + esc(n.fecha) + "</time>" +
-        "<h1>" + bi(n.titulo_es, n.titulo_en) + "</h1>" + (n.texto_es ? "<p>" + bi(n.texto_es, n.texto_en) + "</p>" : "");
+        "<h1>" + bi(n.titulo_es, n.titulo_en) + "</h1>"; // el resumen es solo para la tarjeta
     },
     "noticia-cuerpo": function (d) {
       var n = porId(d.noticias, idUrl());

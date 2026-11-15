@@ -34,6 +34,7 @@
 
 <div class="container adm-layout">
   <nav class="adm-tabs" id="tabs" aria-label="Secciones">
+    <button type="button" data-tab="ayuda" class="adm-tab-help">Cómo funciona</button>
     <button type="button" data-tab="noticias">Noticias</button>
     <button type="button" data-tab="marcos">Marcos conceptuales</button>
     <button type="button" data-tab="lineas">Líneas de investigación</button>
@@ -47,45 +48,10 @@
   </nav>
 
   <main class="adm-main">
-    <div id="nota-local" class="adm-alert" hidden>
-      <strong>Modo demostración: los cambios son solo locales.</strong>
-      Lo que modifiques acá se guarda únicamente en este navegador, a modo de muestra: el sitio lo muestra solo en esta
-      computadora (tocá “Ver sitio”) y nadie más lo ve. No se publica nada.
-    </div>
     <div id="nota-borrador" class="adm-alert warn" hidden>
       <strong>Tus cambios están guardados como borrador en este navegador, pero todavía no se ven en el sitio.</strong>
       Para revisarlos usá “Vista previa”; para que los vea todo el mundo, tocá “Publicar”.
     </div>
-    <details class="adm-guide" id="guia">
-      <summary>¿Cómo funciona este panel?</summary>
-      <div class="adm-guide-body">
-        <h3>Listas y orden</h3>
-        <p>Cada sección (noticias, líneas, personas…) es una lista. El sitio muestra las cosas <strong>en el mismo orden que la lista</strong>.
-          Con las flechas <strong>↑ ↓</strong> cambiás el orden; con <strong>Editar</strong> y <strong>Eliminar</strong>, el contenido.</p>
-        <h3>Destacados: lo que sale en la portada</h3>
-        <p>En noticias, líneas de investigación y marcos conceptuales, <strong>los primeros de la lista son los destacados</strong> y son los
-          únicos que aparecen en la portada (llevan la etiqueta “★ Destacada · en la portada”). Una línea punteada marca dónde termina la portada.
-          Lo que queda debajo se ve con los botones “Ver todas las noticias”, “Ver todas las líneas” o “Ver todos los marcos conceptuales”.
-          Para destacar algo, subilo con ↑. Cuántas noticias y líneas entran en la portada se elige en <strong>Ajustes</strong>;
-          de marcos conceptuales siempre se muestra uno.</p>
-        <h3>Páginas armadas con bloques</h3>
-        <p>Cada noticia, línea y marco conceptual tiene su propia página. Se arma sumando <strong>bloques</strong> (título, subtítulo, texto,
-          imagen, lista, datos destacados, botón, texto resaltado, imagen con texto al lado) con los botones “+ …” al final del formulario.
-          Los bloques se muestran uno debajo del otro, en el orden en que están; se reordenan con sus propias flechas.</p>
-        <h3>“Aparece en”</h3>
-        <p>Debajo de cada elemento se listan los lugares del sitio donde se ve. Al tocar uno, se abre el sitio justo ahí, con el elemento resaltado.</p>
-        <h3>Español e inglés</h3>
-        <p>Casi todos los textos tienen una versión en español y otra en inglés (el botón ES / EN del sitio cambia entre ellas).
-          Si dejás vacía la versión en inglés, se muestra la de español.</p>
-        <h3>Imágenes</h3>
-        <p>Al elegir una foto, el panel la achica automáticamente para que el sitio cargue rápido. No hace falta prepararla antes.</p>
-        <h3>Dónde se guardan los cambios</h3>
-        <p data-guia-local>Por ahora el panel está en <strong>modo demostración</strong>: todo se guarda solo en este navegador y el sitio lo muestra
-          solo en esta computadora. “Volver al contenido original” borra todos los cambios.</p>
-        <p data-guia-github hidden>Los cambios se guardan como borrador en este navegador. “Vista previa” muestra el sitio con el borrador;
-          “Publicar” los sube a GitHub para que los vea todo el mundo (necesita la conexión con GitHub).</p>
-      </div>
-    </details>
     <div id="aviso" class="adm-alert" hidden></div>
     <div id="panel"></div>
   </main>
@@ -102,6 +68,107 @@
     </div>
   </form>
 </dialog>
+
+<!-- Contenido de la pestaña "Cómo funciona" (la primera que se ve al entrar al panel) -->
+<template id="tpl-ayuda">
+  <div class="adm-toolbar"><h2>Cómo funciona este panel</h2></div>
+  <p class="adm-lead">Desde acá se cambia todo el contenido del sitio sin tocar código. Elegí una sección en el menú de la izquierda
+    (o arriba, en el celular). Esta página explica cómo funciona todo; volvé cuando tengas una duda.</p>
+
+  <div class="adm-guide-box" data-guia-local>
+    <h3>Modo demostración: los cambios son solo locales</h3>
+    <p>Por ahora el panel funciona como <strong>demostración</strong>. Todo lo que cambies se guarda solo en este navegador:
+      el sitio lo muestra únicamente en esta computadora y nadie más lo ve. No se publica nada.</p>
+    <ul>
+      <li><strong>Ver sitio ↗</strong> (arriba a la derecha) abre el sitio con tus cambios.</li>
+      <li><strong>Volver al contenido original</strong> borra todos tus cambios.</li>
+      <li>Mientras haya cambios, el sitio muestra un aviso amarillo arriba que lo recuerda.</li>
+    </ul>
+  </div>
+  <div class="adm-guide-box" data-guia-github hidden>
+    <h3>Dónde se guardan los cambios</h3>
+    <p>Los cambios se guardan como borrador en este navegador. <strong>Vista previa</strong> muestra el sitio con el borrador;
+      <strong>Publicar</strong> los sube a GitHub para que los vea todo el mundo (necesita la “Conexión con GitHub”).</p>
+  </div>
+
+  <h3>1. Las secciones</h3>
+  <ul class="adm-guide-list">
+    <li><strong>Noticias:</strong> novedades del laboratorio, cada una con su página.</li>
+    <li><strong>Marcos conceptuales:</strong> las ideas que guían al laboratorio (por ejemplo, RIBio), cada uno con su página.</li>
+    <li><strong>Líneas de investigación:</strong> los proyectos, cada uno con su página.</li>
+    <li><strong>Publicaciones</strong> y <strong>Subsidios:</strong> listados de la portada.</li>
+    <li><strong>Vida de laboratorio:</strong> la galería de fotos.</li>
+    <li><strong>Personas:</strong> el equipo.</li>
+    <li><strong>Contacto:</strong> email, dirección y mapa (aparecen en la portada y en el pie de todas las páginas).</li>
+    <li><strong>Ajustes:</strong> cuántas noticias y líneas salen en la portada, y los recuadros de “contenido de ejemplo”.</li>
+  </ul>
+
+  <h3>2. Cada sección es una lista</h3>
+  <p>El sitio muestra todo <strong>en el mismo orden que la lista</strong> del panel. En cada elemento tenés:</p>
+  <ul class="adm-guide-list">
+    <li><strong>↑ ↓</strong> para cambiarlo de lugar.</li>
+    <li><strong>Editar</strong> para cambiar su contenido.</li>
+    <li><strong>Eliminar</strong> para sacarlo del sitio.</li>
+    <li>Para sumar algo nuevo, tocá <strong>+ Agregar</strong> arriba de la lista.</li>
+  </ul>
+  <p>Los cambios se guardan solos al tocar <strong>Guardar</strong> en el formulario (en Contacto y Ajustes, mientras escribís).</p>
+
+  <h3>3. Qué sale en la portada</h3>
+  <p>En <strong>noticias, líneas de investigación y marcos conceptuales</strong>, los primeros de la lista son los <strong>destacados</strong>:
+    son los únicos que se ven en la portada. Llevan la etiqueta <span class="adm-tag star">★ Destacada · en la portada</span>
+    y una línea punteada marca dónde termina la portada. El resto se ve con los botones
+    “Ver todas las noticias”, “Ver todas las líneas” y “Ver todos los marcos conceptuales”.</p>
+  <ul class="adm-guide-list">
+    <li>Para destacar algo, <strong>subilo con ↑</strong> hasta que quede entre los primeros.</li>
+    <li>Cuántas noticias y cuántas líneas entran en la portada se elige en <strong>Ajustes</strong>. De marcos conceptuales siempre sale uno.</li>
+    <li>Las noticias nuevas se agregan <strong>arriba de todo</strong>, así que salen en la portada sin hacer nada.</li>
+  </ul>
+
+  <h3>4. Noticias, líneas y marcos: tarjeta y página</h3>
+  <p>Cada uno tiene dos partes, y el formulario está dividido igual:</p>
+  <ol class="adm-guide-list">
+    <li><strong>Cómo se ve desde afuera:</strong> la <em>tarjeta</em> que aparece en la portada y en los listados. Lleva imagen, título
+      y una descripción corta. Mientras escribís, abajo ves cómo va a quedar. La descripción es solo para la tarjeta:
+      no se repite dentro de la página.</li>
+    <li><strong>Cómo se ve la página:</strong> lo que se abre al hacer clic en la tarjeta. Arriba aparece el título y, debajo,
+      lo que armes con <strong>bloques</strong>.</li>
+  </ol>
+
+  <h3>5. Armar una página con bloques</h3>
+  <p>Una página se arma sumando bloques, que se muestran uno debajo del otro. Si la página está vacía, el botón
+    <strong>Empezar con un modelo</strong> pone un título, un texto y una imagen listos para completar. Para sumar más,
+    tocá el tipo de bloque en “Agregar un bloque a la página”: se agrega al final, y después lo movés con ↑ ↓ o lo quitás.</p>
+  <table class="adm-guide-table">
+    <tr><td><span class="adm-pal-ico">T</span> Título</td><td>Un título grande para empezar una parte.</td></tr>
+    <tr><td><span class="adm-pal-ico">t</span> Subtítulo</td><td>Un título más chico, dentro de una parte.</td></tr>
+    <tr><td><span class="adm-pal-ico">¶</span> Texto</td><td>Uno o varios párrafos. Para separar párrafos, dejá una línea en blanco.</td></tr>
+    <tr><td><span class="adm-pal-ico">▣</span> Imagen</td><td>Una foto o ilustración, con epígrafe opcional.</td></tr>
+    <tr><td><span class="adm-pal-ico">◧</span> Imagen con texto al lado</td><td>Imagen a un costado y texto al otro. Si ponés varios seguidos, la imagen va alternando de lado.</td></tr>
+    <tr><td><span class="adm-pal-ico">•</span> Lista</td><td>Puntos uno debajo del otro: escribí uno por renglón.</td></tr>
+    <tr><td><span class="adm-pal-ico">#</span> Datos destacados</td><td>Números o datos clave en recuadros. Uno por renglón, así: <code>~22 kHz | Llamadas largas</code>.</td></tr>
+    <tr><td><span class="adm-pal-ico">❝</span> Texto resaltado</td><td>Una frase o pregunta que se destaca en color.</td></tr>
+    <tr><td><span class="adm-pal-ico">↗</span> Botón</td><td>Un botón que lleva a otra página (de este sitio o de afuera).</td></tr>
+  </table>
+
+  <h3>6. “Aparece en”</h3>
+  <p>Debajo de cada elemento de una lista se ven los lugares del sitio donde aparece (por ejemplo <em>Portada</em>, <em>Su página</em>).
+    Al tocar uno se abre el sitio justo ahí, con el elemento resaltado.</p>
+
+  <h3>7. Personas y publicaciones en cada línea</h3>
+  <p>Al editar una persona o una publicación podés marcar a qué líneas de investigación pertenece. Así aparece también,
+    sola, al final de la página de esa línea.</p>
+
+  <h3>8. Español e inglés</h3>
+  <p>Casi todos los textos tienen una versión en español y otra en inglés (el botón ES / EN del sitio cambia entre ellas).
+    Si dejás vacía la versión en inglés, se muestra la de español.</p>
+
+  <h3>9. Imágenes</h3>
+  <p>Al elegir una foto, el panel la achica automáticamente para que el sitio cargue rápido. No hace falta prepararla antes.</p>
+
+  <h3>10. El mapa de Contacto</h3>
+  <p>En <strong>Contacto</strong> podés pegar el link de Google Maps: buscá el lugar en Google Maps, tocá <strong>Compartir</strong> y
+    copiá el link (o, más preciso, <strong>Insertar un mapa → Copiar HTML</strong>). El panel te muestra el mapa para que confirmes que está bien.</p>
+</template>
 
 <noscript><p class="container">El panel necesita JavaScript.</p></noscript>
 </body>
